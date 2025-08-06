@@ -47,7 +47,8 @@ gobuster dir -w /home/eduard/WordList/directories.txt -u http://172.17.0.2
 
 Una vez identificado el directorio `/drupal`, es crucial inspeccionar su contenido y realizar un fuzzing más profundo dentro de esta ruta para descubrir más recursos. 
 
-![[Ejotapete_Drupal.png]]
+![Ejotapete_Drupal](Imagenes/Ejotapete_Drupal.png)
+
 ### Comando Gobuster (Segunda Fase)
 
 ```bash
@@ -111,7 +112,7 @@ ruby 44449.rb http://172.17.0.2/drupal/ # ejecutamos el exploit
 
 ### Obtención de Ejecución Remota de Comandos (RCE)
 
-Tras la ejecución exitosa del exploit, se obtiene una shell en el servidor. ![[Ejotapete_Drupal_ReverseSell.png]]
+Tras la ejecución exitosa del exploit, se obtiene una shell en el servidor. [Ejotapete_Drupal_ReverseSell](Imagenes/Ejotapete_Drupal_ReverseSell.png)
 
 ```bash
 whoami # www-data
