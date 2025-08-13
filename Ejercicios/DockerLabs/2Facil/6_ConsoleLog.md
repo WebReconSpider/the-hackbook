@@ -140,7 +140,7 @@ El archivo `/etc/passwd` contiene información sobre los usuarios del sistema. L
 sudo -u root /usr/bin/nano /etc/passwd
 ```
 
-    Dentro de `nano`, busca la línea que comienza con `root:` y elimina la `x` después del primer dos puntos. La línea debería cambiar de `root:x:0:0:root:/root:/bin/bash` a `root::0:0:root:/root:/bin/bash`.
+Dentro de `nano`, busca la línea que comienza con `root:` y elimina la `x` después del primer dos puntos. La línea debería cambiar de `root:x:0:0:root:/root:/bin/bash` a `root::0:0:root:/root:/bin/bash`.
 
 2.  **Guardar y Salir:** Guarda los cambios (Ctrl+O, Enter) y sal de `nano` (Ctrl+X).
 
