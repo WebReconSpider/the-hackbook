@@ -136,9 +136,9 @@ El archivo `/etc/passwd` contiene información sobre los usuarios del sistema. L
 
 1.  **Editar `/etc/passwd` con `nano` como `root`:**
 
-    ```bash
+```bash
 sudo -u root /usr/bin/nano /etc/passwd
-    ```
+```
 
     Dentro de `nano`, busca la línea que comienza con `root:` y elimina la `x` después del primer dos puntos. La línea debería cambiar de `root:x:0:0:root:/root:/bin/bash` a `root::0:0:root:/root:/bin/bash`.
 
@@ -146,9 +146,9 @@ sudo -u root /usr/bin/nano /etc/passwd
 
 3.  **Cambiar a `root`:** Ahora, puedes usar el comando `su root` (o simplemente `su`) y no te pedirá contraseña.
 
-    ```bash
+```bash
 su root
-    ```
+```
 
 El comando `whoami` confirmará que hemos escalado exitosamente a `root`.
 
