@@ -96,6 +96,7 @@ system('whoami'); // Añadimos esta línea para probar la ejecución de comandos
 // ... más código existente ...
 ?>
 ```
+![[Candy_whoami.png]]
 
 Al guardar y recargar la página principal del sitio, deberíamos ver el resultado del comando `whoami` (por ejemplo, `www-data`), confirmando que podemos ejecutar comandos en el servidor web.
 
