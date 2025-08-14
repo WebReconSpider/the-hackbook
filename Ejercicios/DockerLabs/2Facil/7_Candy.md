@@ -29,7 +29,7 @@ whatweb http://<IP_DEL_OBJETIVO>
 ## 2. Enumeración Web y Descubrimiento de Credenciales
 
 Con la identificación de Joomla! y la pista del `robots.txt`, profundizamos en la enumeración web para encontrar información sensible.
-![[Candy.png]]
+![Candy.png](https://github.com/WebReconSpider/the-hackbook/blob/main/Ejercicios/DockerLabs/2Facil/Imagenes/Candy.png)
 ### 2.1. Fuzzing Web con Gobuster
 
 Realizamos un fuzzing de directorios con `gobuster` para descubrir rutas ocultas o archivos interesantes en el servidor web. Esto nos ayuda a mapear la estructura del sitio y encontrar posibles puntos de entrada.
@@ -70,7 +70,7 @@ Ahora tenemos un par de credenciales: `admin:sanluis12345`.
 ## 3. Acceso al Panel de Administración de Joomla!
 
 Con las credenciales obtenidas, intentamos iniciar sesión en el panel de administración de Joomla!.
-![[Candy_InicioSesión.png]]
+![InicioSesión](https://github.com/WebReconSpider/the-hackbook/blob/main/Ejercicios/DockerLabs/2Facil/Imagenes/Candy_InicioSesión.png)
 ### 3.1. Inicio de Sesión en `/administrator`
 
 Accedemos a la URL `http://<IP_DEL_OBJETIVO>/administrator/index.php` e intentamos iniciar sesión con las credenciales `admin:sanluis12345`. El inicio de sesión es exitoso, lo que nos da acceso al panel de administración de Joomla!.
@@ -96,7 +96,7 @@ system('whoami'); // Añadimos esta línea para probar la ejecución de comandos
 // ... más código existente ...
 ?>
 ```
-![[Candy_whoami.png]]
+![Whoami](https://github.com/WebReconSpider/the-hackbook/blob/main/Ejercicios/DockerLabs/2Facil/Imagenes/Candy_whoami.png)
 
 Al guardar y recargar la página principal del sitio, deberíamos ver el resultado del comando `whoami` (por ejemplo, `www-data`), confirmando que podemos ejecutar comandos en el servidor web.
 
