@@ -19,13 +19,17 @@ Nos centramos en el puerto 8089, ya que es el servicio más prometedor para enco
 ### 2.1. Exploración del Puerto 8089
 
 Al acceder a `http://<IP_DEL_OBJETIVO>:8089/`, encontramos una página web simple con un campo de entrada. Al introducir texto como "Hola", la página responde con "Hola Hola". Este comportamiento, donde la entrada del usuario se repite directamente en la salida, es un fuerte indicador de una posible vulnerabilidad de Server-Side Template Injection (SSTI).
-![[Verdejo_P_8089.png]]
+
+![P_8089.png](https://github.com/WebReconSpider/the-hackbook/blob/main/Ejercicios/DockerLabs/2Facil/Imagenes/Verdejo_P_8089.png)
+
 ### 2.2. Confirmación de SSTI con Jinja2
 
 Para confirmar la vulnerabilidad SSTI y determinar el motor de plantillas, probamos una expresión matemática simple dentro de la sintaxis de plantillas de Jinja2, que es común en aplicaciones Python como las que usan Werkzeug.
 
 Introducimos `{{7*7}}` en el campo de entrada. Si la página devuelve `49`, esto confirma la vulnerabilidad SSTI y que el motor de plantillas es Jinja2. Esto significa que la aplicación web procesa la entrada del usuario a través de un motor de plantillas en el servidor sin una validación adecuada, permitiendo la inyección de código de plantilla malicioso.
-![[Pasted image 20250807193357.png]]
+
+![Verdejo_49](https://github.com/WebReconSpider/the-hackbook/blob/main/Ejercicios/DockerLabs/2Facil/Imagenes/Verdejo_49.png)
+
 ## 3. Obtención de Reverse Shell (RCE)
 
 Una vez confirmada la SSTI, podemos explotarla para ejecutar comandos en el sistema y obtener una shell inversa.
