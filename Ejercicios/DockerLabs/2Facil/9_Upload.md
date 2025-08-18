@@ -10,7 +10,8 @@ nmap -O -sC -sV <IP_DEL_OBJETIVO>
 
 *   `80/tcp open http Apache` El título de la página (`Upload here your file`) es una pista clara sobre la funcionalidad principal del sitio.
 
-[SubirArchivo](https://github.com/WebReconSpider/the-hackbook/blob/main/Ejercicios/DockerLabs/2Facil/Imagenes/Upload_SubirArchivo.png)
+![SubirArchivo](https://github.com/WebReconSpider/the-hackbook/blob/main/Ejercicios/DockerLabs/2Facil/Imagenes/Upload_SubirArchivo.png)
+
 ### 1.2. Análisis de la Página Web con WhatWeb
 
 Utilizamos `whatweb` para obtener más información sobre la tecnología utilizada en la página web. Esta herramienta escaneará la URL y reportará tecnologías, versiones y otros detalles.
