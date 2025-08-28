@@ -135,3 +135,25 @@
 | `items()`  | Devuelve una vista de los pares clave-valor (como tuplas).                     | Ninguno                  | `elementos = diccionario.items()`                |
 | `update()` | Actualiza el diccionario con pares clave-valor de otro diccionario o iterable. | `otro_diccionario`       | `diccionario.update({"profesion": "Ingeniera"})` |
 | `copy()`   | Devuelve una copia superficial del diccionario.                                | Ninguno                  | `nuevo_diccionario = diccionario.copy()`         |
+
+
+## Condicionales
+
+| Concepto           | Descripción                                                                            | Sintaxis / Ejemplo                                                                                                                            |
+| ------------------ | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| if                 | Ejecuta un bloque de código si la condición es verdadera.                              | if condicion: <br>     # Código                                                                                                               |
+| else               | Ejecuta un bloque de código si la condición del if es falsa. **Hay que poner ':'**     | if condicion: <br>     # Código si es verdadero <br> else: <br>     # Código si es falso                                                      |
+| elif               | Evalúa múltiples condiciones en secuencia.                                             | if condicion1: <br> # Código si condicion1 <br> elif condicion2: <br> # Código si condicion2 <br> else: <br> # Código si ninguna es verdadera |
+| Concatenación      | La condición puede tener varias condiciones seguidas. Se evalúa de izquierda a derecha | if 0 < positivo <100: <br>     # Código                                                                                                       |
+| Anidamiento        | Permite estructuras condicionales dentro de otras.                                     | if condicion_externa: <br> if condicion_interna: <br> # Código                                                                                |
+| Operadores Lógicos | Combinan condiciones (and, or, not).                                                   | if a > 0 and b < 10: <br> # Código                                                                                                            |
+| Operador `in`      | Comprueba si el valor está en el conjunto                                              | if variable in conjunto:<br>    # Código                                                                                                      |
+
+## Tratar entrada de información por teclado
+
+| Concepto | Descripción                                                        | Sintaxis / Ejemplo                      |
+| -------- | ------------------------------------------------------------------ | --------------------------------------- |
+| input()  | Introducir información por teclado. **El valor SIEMPRE es un str** | entrada = input("Introduce el texto: ") |
+| .upper() | Convierte el string en mayuscula                                   | variableString.upper()                  |
+| .lower() | Convierte el string en minuscula                                   | variableString.lower()                  |
+
