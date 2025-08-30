@@ -1,6 +1,6 @@
 ## 1. Reconocimiento Inicial de Puertos con Nmap
 
-Realizamos un escaneo con `nmap` para detectar puertos abiertos, sus versiones y el sistema operativo. Esto nos ayuda a entender qué servicios están expuestos y si hay alguna vulnerabilidad conocida asociada a sus versiones.
+Realizamos un escaneo con `nmap` para detectar puertos abiertos
 
 ```bash
 nmap -O -sC -sV <IP_DEL_OBJETIVO>
