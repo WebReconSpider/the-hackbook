@@ -1,5 +1,5 @@
 ## 1. Reconocimiento Inicial de Puertos con Nmap
-
+ 
 Realizamos un escaneo con `nmap` para detectar puertos abiertos
 
 ```bash
