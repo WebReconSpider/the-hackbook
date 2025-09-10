@@ -149,6 +149,33 @@
 | Operadores Lógicos | Combinan condiciones (and, or, not).                                                   | if a > 0 and b < 10: <br> # Código                                                                                                            |
 | Operador `in`      | Comprueba si el valor está en el conjunto                                              | if variable in conjunto:<br>    # Código                                                                                                      |
 
+
+## Bucle for
+
+| Concepto            | Descripción                                                                                                                          | Sintaxis / Ejemplo                                                                                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Bucle for           | Itera sobre los elementos de una secuencia (listas, tuplas, cadenas, diccionarios). En cada iteración: elemento = valor de secuencia | `for elemento in [secuencia]: <br>        # Código a ejecutar por cada  elemento`                                                                                  |
+| Función range()     | Genera una secuencia de números para iterar.                                                                                         | range(fin): Desde 0 hasta fin-1 <br> range(inicio, fin): Desde inicio hasta fin-1 <br> range(inicio, fin, paso): Desde inicio hasta fin-1, con un paso determinado |
+| Iterar con índices  | Acceder a elementos y sus índices simultáneamente.                                                                                   | for i in range(len(lista)): <br> # Usar lista[i]                                                                                                                   |
+| Función enumerate() | Devuelve pares (índice, valor) al iterar.                                                                                            | for indice, valor in enumerate(secuencia): <br> # Código                                                                                                           |
+| Iterar diccionarios | Recorrer claves, valores o pares clave-valor de un diccionario.                                                                      | for clave in diccionario: <br> for valor in diccionario.values(): <br> for clave, valor in diccionario.items():                                                    |
+| Bucles Anidados     | Un bucle dentro de otro bucle. Útil para estructuras de datos multidimensionales.                                                    | for i in range(3): <br> for j in range(3): <br> print(f"({i}, {j})")                                                                                               |
+
+## Bucle while
+
+| Concepto    | Descripción                                     | Sintaxis / Ejemplo                                                                                                  |
+| ----------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Bucle while | Se repite mientras una condición sea verdadera. | while condicion: <br> # Código a ejecutar <br> # Asegurarse de que la condición cambie para evitar bucles infinitos |
+
+## Sentencias de Control de Bucle
+
+| Concepto       | Descripción                                                                           | Sintaxis / Ejemplo                                                                                              |
+| -------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| continue       | Salta el resto del código en la iteración actual y pasa a la siguiente.               | for i in range(5): <br> if i == 2: continue <br> print(i) <br> Output: 0, 1, 3, 4                               |
+| pass           | Es una operación nula; no hace nada. Se usa como marcador de posición.                | if condicion: <br> pass <br> else: <br> # Código                                                                |
+| else en bucles | El bloque else se ejecuta cuando el bucle termina de forma natural (no por un break). | for i in range(3): <br> print(i) <br> else: <br> print("Bucle terminado") <br> Output: 0, 1, 2, Bucle terminado |
+
+
 ## Tratar entrada de información por teclado
 
 | Concepto | Descripción                                                        | Sintaxis / Ejemplo                      |
