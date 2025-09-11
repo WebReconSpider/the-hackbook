@@ -9,7 +9,7 @@
 | **Cadenas (`str`)**     | `texto = "Hola Mundo"` |
 | **Booleanos (`bool`)**  | `es_verdadero = True`  |
 
-### Operadores Aritméticos
+### Operadores Aritméticos 
 
 | Operador | Descripción | Ejemplo |
 |---|---|---|
