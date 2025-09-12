@@ -184,3 +184,8 @@
 | .upper() | Convierte el string en mayuscula                                   | variableString.upper()                  |
 | .lower() | Convierte el string en minuscula                                   | variableString.lower()                  |
 
+## Uso de funciones
+
+| Concepto | Descripción                                                                                                         | Ejemplo               |
+| -------- | ------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| print()  | Muestra por pantalla un string. Puedes modificar el final, en vez de añadir un salto de linea, que ponga un espacio | prnt("Hola", end=" ") |
