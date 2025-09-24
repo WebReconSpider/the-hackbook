@@ -1,3 +1,5 @@
+## Escaneo de puertos con nmao
+
 ```
 nmap -sV -sC -O -p- 172.17.0.2
 ```
@@ -14,7 +16,7 @@ nmap -sV -sC -O -p- 172.17.0.2
 445/tcp open  netbios-ssn Samba smbd 4l
 ```
 
-escaneo de directorios
+## Escaneo de directorios
 ```bash
 /.html                (Status: 403) [Size: 275]  
 /.php                 (Status: 403) [Size: 275]  
@@ -205,7 +207,7 @@ whoami
 # www-data
 ```
 
-### Tratamiento de la TTY
+## Tratamiento de la TTY
 
 Para trabajar mejor: Ejecutamos el siguiente comando: 
 ```bash
@@ -218,6 +220,7 @@ export TERM=xterm
 export SHELL=bash
 ```
 
+## Escalada de privilegios 
 ```bash
 sudo -l
 (ALL) NOPASSWD: /usr/sbin/service
