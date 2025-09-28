@@ -184,3 +184,18 @@
 | .upper() | Convierte el string en mayuscula                                   | variableString.upper()                  |
 | .lower() | Convierte el string en minuscula                                   | variableString.lower()                  |
 
+
+
+## Añadir
+para seleccionar los n primeros elementos de un array: array[:n]
+
+- `stats.norm(...)`  
+    Crea un **objeto distribución normal** en `scipy.stats`.  
+    Este objeto se puede parametrizar con:
+    
+    - `loc` → la **media** μ\muμ.
+        
+    - `scale` → la **desviación estándar** σ\sigmaσ.
+        
+    
+    🔎 Ejemplo: `stats.norm(loc=2, scale=3)` es una gaussiana N(μ=2,σ=3)N(\mu=2, \sigma=3)N(μ=2,σ=3).
