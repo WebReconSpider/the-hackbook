@@ -1,0 +1,15 @@
+# Preparación OSWP (Curso s4vitar)
+
+# Índice de los contenidos
+- [[#1. Modo monitor CONCEPTO|1. Modo monitor CONCEPTO]]
+
+---------------
+# Contenido Resumido y Ampliado del Curso
+
+## 1. Modo monitor CONCEPTO
+
+El modo monitor es fundamental para cualquier ataque a redes inalámbricas, ya que permite a la tarjeta de red capturar todos los paquetes que circulan por el aire, independientemente de a quién vayan dirigidos.
+
+### Explicación técnica:
+- **Definición**: El modo monitor es un estado especial de las tarjetas de red inalámbricas que permite capturar todos los paquetes sin estar asociado a ningún punto de acceso.
+- **Diferencia con modo normal**: En modo normal (managed), la tarjeta solo procesa paquetes dirigidos a su MAC.
