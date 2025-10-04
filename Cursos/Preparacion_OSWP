@@ -74,3 +74,44 @@ Cuando pones la tarjeta en **modo monitor**, este proceso sigue intentando gesti
 - Configurar la IP, la máscara de red, la puerta de enlace, etc.
 
 En modo monitor, **no necesitas IP**, porque no te vas a asociar a ninguna red, sólo a capturar paquetes. Por eso se recomienda matar `dhclient` también.
+
+## 3. Falsificación de nuestra dirección MAC y tips
+
+La falsificación de la dirección MAC es una técnica importante para mantener el anonimato durante las pruebas de penetración y evitar ser detectado o bloqueado.
+
+### Procedimiento técnico:
+1. Importante desactivar la interfaz:
+   ```bash
+   ifconfig wlan0mon down
+   ```
+
+ 2. Verificar la dirección MAC:
+   ```bash
+   macchanger -s wlan0mon
+   ```
+
+3. Cambiar la dirección MAC:
+   ```bash
+   macchanger --mac=00:11:22:33:44:55 wlan0mon
+   ```
+   O para generar una MAC aleatoria:
+   ```bash
+   macchanger -r wlan0mon
+   ```
+
+4. Reactivar la interfaz:
+   ```bash
+   ifconfig wlan0mon up
+   ```
+
+### Tips adicionales:
+- Usar direcciones MAC de fabricantes reales para evitar detección
+```bash
+macchanger -l | greep -i "fabricante"
+# los últimos 6 pueden ser inventados
+```
+- Cambiar la MAC regularmente durante sesiones largas de auditoría
+- Algunas tarjetas requieren ser reiniciadas completamente para que el cambio sea efectivo
+### Consideraciones de seguridad:
+- Los puntos de acceso modernos pueden detectar comportamientos sospechosos incluso con MAC falsificada
+- Algunos routers empresariales tienen sistemas de detección de intrusiones que pueden identificar patrones de tráfico anómalos
