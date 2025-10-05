@@ -115,3 +115,38 @@ macchanger -l | greep -i "fabricante"
 ### Consideraciones de seguridad:
 - Los puntos de acceso modernos pueden detectar comportamientos sospechosos incluso con MAC falsificada
 - Algunos routers empresariales tienen sistemas de detección de intrusiones que pueden identificar patrones de tráfico anómalos
+
+## 4. Uso de Airodump para efectuar un análisis del entorno (P.A.)
+
+Airodump-ng es una herramienta fundamental para la recopilación de información sobre redes inalámbricas en el entorno, permitiendo identificar puntos de acceso, clientes conectados y otros datos relevantes.
+### Comando básico:
+```bash
+airodump-ng wlan0mon
+```
+
+### Información mostrada:
+- Primera línea:
+		Canal, Tiempo transcurrido, fecha, y si se ha capturado un handshake y de que red
+
+- **BSSID**: Dirección MAC del punto de acceso
+- **PWR**: Nivel de señal (cuanto más cercano a 0, más fuerte). Si es -1 significa que estamos fuera del alcance o que el controlador no acepta informes de nivel de señal
+- **Beacons**: Número de paquetes beacon capturados
+- **Data**: Paquetes de datos (importante para capturar handshakes)
+- `#/s` nº de paquetes de datos enviados por segundo (ultimos 10 seg)
+- **CH**: Canal en el que opera la red
+- **MB**: Velocidad máxima soportada
+- **ENC**: Tipo de cifrado (WEP, WPA, WPA2,OPN)
+- **CIPHER**: Algoritmo de cifrado (TKIP, CCMP)
+- **AUTH**: Tipo de autenticación (PSK, MGT)
+- **ESSID**: Nombre de la red
+
+### Consideraciones importantes:
+- Las redes WPA y WPA2 se muestran de forma diferente en Airodump
+- WPA utiliza típicamente TKIP como cifrado
+- WPA2 utiliza típicamente CCMP (basado en AES) como cifrado
+- Solo se pueden atacar redes con autenticación PSK (Pre-Shared Key)
+- Las redes empresariales (AUTH=MGT) utilizan autenticación 802.1X y no son vulnerables a los ataques de diccionario convencionales
+
+### Vulnerabilidades específicas:
+- WPA con TKIP es vulnerable a ataques de reinstalación de clave (KRACK)
+- WPA2 con CCMP ofrece mejor seguridad pero sigue siendo vulnerable a ataques de fuerza bruta si la contraseña es débil
