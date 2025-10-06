@@ -150,3 +150,31 @@ airodump-ng wlan0mon
 ### Vulnerabilidades específicas:
 - WPA con TKIP es vulnerable a ataques de reinstalación de clave (KRACK)
 - WPA2 con CCMP ofrece mejor seguridad pero sigue siendo vulnerable a ataques de fuerza bruta si la contraseña es débil
+
+
+## 5. Uso de Airodump para efectuar un análisis del entorno 2 (clientes)
+
+### Técnicas avanzadas:
+1. Monitorización de clientes conectados:
+   ```bash
+   airodump-ng -c [canal] --bssid [MAC_del_AP] wlan0mon
+   ```
+
+2. Identificación de relaciones cliente-AP:
+	La parte inferior de la pantalla de Airodump muestra los clientes y a qué AP están conectados
+
+   - **STATION**: Dirección MAC del cliente
+   - **PWR**: Nivel de señal del cliente
+   - **Rate**: Velocidad de transmisión
+   - **Lost**: Paquetes perdidos
+   - **Frames**: Número de frames capturados
+   - **Probes**: Redes a las que el cliente ha intentado conectarse anteriormente
+
+### Consideraciones de versiones:
+- Las redes WPA y WPA2 se tratan de manera similar en esta fase de reconocimiento
+- Los clientes conectados a redes WPA2-Enterprise no mostrarán información útil para ataques de PSK
+
+### Limitaciones:
+- Algunos dispositivos modernos utilizan MAC aleatoria para probe requests, dificultando el seguimiento
+- Los dispositivos iOS y Android recientes ocultan el SSID real en sus probe requests como medida de privacidad
+- La efectividad depende de la actividad de los clientes en la red
