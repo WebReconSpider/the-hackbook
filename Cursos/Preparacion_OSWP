@@ -178,3 +178,21 @@ airodump-ng wlan0mon
 - Algunos dispositivos modernos utilizan MAC aleatoria para probe requests, dificultando el seguimiento
 - Los dispositivos iOS y Android recientes ocultan el SSID real en sus probe requests como medida de privacidad
 - La efectividad depende de la actividad de los clientes en la red
+
+## 6. Modos de filtro con Airodump
+
+Este video explica las diferentes opciones de filtrado en Airodump-ng para optimizar la captura de información relevante y reducir el ruido.
+
+### Opciones de filtrado principales:
+
+| **Función**                        | **Comando**                                                                             |
+| ---------------------------------- | --------------------------------------------------------------------------------------- |
+| Filtrado por canal                 | `bash<br>airodump-ng -c 6 wlan0mon<br>`                                                 |
+| Uso de listas de BSSIDs            | `airodump-ng -c 1,6,11 wlan0mon`                                                        |
+| Filtrado por BSSID (MAC del AP)    | `bash<br>airodump-ng --bssid 00:11:22:33:44:55 wlan0mon<br>`                            |
+| Filtrado por ESSID (nombre de red) | `bash<br>airodump-ng --essid "NombreDeRed" wlan0mon<br>`                                |
+| Combinación de filtros             | `bash<br>airodump-ng -c 6 --bssid 00:11:22:33:44:55 --essid "NombreDeRed" wlan0mon<br>` |
+
+### Aplicabilidad por versiones:
+- Estos filtros funcionan igual para redes WPA y WPA2
+- Para redes que utilizan band steering (cambio entre 2.4GHz y 5GHz), puede ser necesario monitorear múltiples canales
