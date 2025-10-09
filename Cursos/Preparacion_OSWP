@@ -193,6 +193,37 @@ Este video explica las diferentes opciones de filtrado en Airodump-ng para optim
 | Filtrado por ESSID (nombre de red) | `bash<br>airodump-ng --essid "NombreDeRed" wlan0mon<br>`                                |
 | Combinación de filtros             | `bash<br>airodump-ng -c 6 --bssid 00:11:22:33:44:55 --essid "NombreDeRed" wlan0mon<br>` |
 
+## 7. Exportación de evidencias con Airodump
+
+Este video muestra cómo guardar la información capturada por Airodump-ng para su posterior análisis o como evidencia en auditorías de seguridad.
+
+### Opciones de exportación:
+| **Descripción**               | **Comando**                                                                       |
+| ----------------------------- | --------------------------------------------------------------------------------- |
+| Guardar en formato básico     | `airodump-ng -w <nombreArchivo>  wlan0mon`                                        |
+| Guardar con filtros aplicados | `airodump-ng -c 6 --bssid 00:11:22:33:44:55 -w <nombreArchivo>  wlan0mon`         |
+| Especificar formato de salida | `airodump-ng -w <nombreArchivo>  --output-format pcap,csv,kismet,netxml wlan0mon` |
+de aquí salen unos 5 archivos. el que nos interesa es el .cap
+
+- Para ver el tamaño del fichero durante la captura (en otra terminal):
+```bash
+watch -n 1 du -hc captura-01.cap
+```
+### Formatos de archivo generados:
+•captura-01.cap: Archivo de captura en formato pcap (compatible con Wireshark)
+•captura-01.csv: Datos en formato CSV para análisis en hojas de cálculo
+•captura-01.kismet.csv: Formato compatible con Kismet
+•captura-01.kismet.netxml: Datos en formato XML
+
+### Consideraciones importantes:
+- Para capturas específicas de handshakes, es recomendable usar el formato pcap
+- Se recomienda usar la opción --write-interval para dividir capturas largas
+
+### Comando completo recomendado:
+```bash
+airodump-ng -c 6 --bssid 00:11:22:33:44:55 -w captura --output-format pcap --write-interval 300 wlan0mon
+```
+
 ### Aplicabilidad por versiones:
 - Estos filtros funcionan igual para redes WPA y WPA2
 - Para redes que utilizan band steering (cambio entre 2.4GHz y 5GHz), puede ser necesario monitorear múltiples canales
