@@ -227,3 +227,23 @@ airodump-ng -c 6 --bssid 00:11:22:33:44:55 -w captura --output-format pcap --wri
 ### Aplicabilidad por versiones:
 - Estos filtros funcionan igual para redes WPA y WPA2
 - Para redes que utilizan band steering (cambio entre 2.4GHz y 5GHz), puede ser necesario monitorear múltiples canales
+
+## 8. Concepto de HandShake
+
+### Explicación técnica del handshake:
+- El handshake es un proceso de 4 vías (4-way handshake) que ocurre cuando un cliente se conecta a una red WPA/WPA2
+- Durante este proceso, el cliente y el punto de acceso intercambian información para derivar las claves de cifrado
+- El handshake contiene suficiente información para verificar contraseñas offline
+
+### Estructura del 4-way handshake:
+Durante este intercambio, el cliente y el punto de acceso (AP) **generan y verifican las claves que cifrarán la comunicación**.
+1. AP → Cliente: Envía ANonce (número aleatorio)
+2. Cliente → AP: Envía SNonce y MIC (código de integridad del mensaje)
+3. AP → Cliente: Envía GTK (Group Temporal Key) cifrada
+4. Cliente → AP: Confirmación
+
+### Vulnerabilidades específicas:
+- Ni WPA ni WPA2 son vulnerables a ataques de recuperación de clave a partir del handshake
+- La única forma de obtener la contraseña es mediante fuerza bruta o diccionario
+- WPA con TKIP es vulnerable a ataques adicionales como el ataque Beck-Tews
+- WPA2 con CCMP es vulnerable a KRACK (Key Reinstallation Attack) en implementaciones específicas
