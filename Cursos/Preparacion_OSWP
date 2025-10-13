@@ -247,3 +247,36 @@ Durante este intercambio, el cliente y el punto de acceso (AP) **generan y verif
 - La única forma de obtener la contraseña es mediante fuerza bruta o diccionario
 - WPA con TKIP es vulnerable a ataques adicionales como el ataque Beck-Tews
 - WPA2 con CCMP es vulnerable a KRACK (Key Reinstallation Attack) en implementaciones específicas
+
+## 9. Ataque de Deautenticación dirigido
+
+Este video explica cómo realizar un ataque de deautenticación dirigido para forzar a un cliente específico a desconectarse y reconectarse, generando así un handshake que puede ser capturado.
+
+- No requieren autenticación para ser procesados (vulnerabilidad de diseño)
+### Procedimiento detallado:
+1. Identificar el AP objetivo y un cliente conectado:
+   ```bash
+   airodump-ng -c [canal] --bssid [MAC_del_AP] -w captura wlan0mon
+   ```
+
+2. Ejecutar el ataque de deautenticación dirigido:
+   ```bash
+   aireplay-ng -0 10 -e [ESSID_del_AP] -c [MAC_del_cliente] wlan0mon
+   ```
+   Donde:
+   - `-0` indica ataque de deautenticación
+   - `10` es el número de paquetes a enviar
+   - `-a` especifica el BSSID del AP
+   - `-e` especifica el ESSID del AP
+   - `-c` especifica la MAC del cliente objetivo
+
+### Consideraciones prácticas:
+- Usar pocos paquetes (1-5) para ser menos detectable
+- Verificar que el handshake ha sido capturado (aparecerá "WPA handshake" en la esquina superior derecha de airodump-ng)
+- Algunos dispositivos modernos pueden ignorar frames de deautenticación sospechosos
+- La efectividad depende de la distancia y potencia de la señal
+
+### Contramedidas y limitaciones:
+- Algunos APs empresariales detectan ataques de deautenticación
+- WPA3 implementa protección contra este tipo de ataques
+- Este ataque es detectable por sistemas de detección de intrusiones inalámbricas (WIDS)
