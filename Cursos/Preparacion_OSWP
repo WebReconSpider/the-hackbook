@@ -311,3 +311,44 @@ Otra forma similar:
 ```bash
 aireplay-ng -0 <numPaquetes> -e <nombreRed> -c FF:FF:FF:FF:FF:FF <nombreTarjetaRed>
 ```
+## 11. Ataque de Falsa Autenticación
+
+### Descripción del Ataque
+
+El ataque de falsa autenticación es una técnica utilizada en redes inalámbricas, especialmente en aquellas que usan cifrado WEP (aunque también puede aplicarse en ciertos escenarios WPA/WPA2), para asociarse con un punto de acceso (AP) sin necesidad de una autenticación real. Su principal utilidad radica en obtener una dirección MAC asociada al AP cuando no hay clientes legítimos conectados, lo cual es crucial para realizar otros ataques de inyección de paquetes, como los ataques de desautenticación o la inyección de ARP.
+
+Es importante destacar que este ataque NO genera paquetes ARP por sí mismo; su objetivo es establecer una asociación falsa para facilitar ataques posteriores que sí los requieran.
+
+### Funcionamiento y Uso (con `aireplay-ng`)
+
+```bash
+aireplay-ng -1 0 -e [ESSID] -a [MAC_AP] -h [MAC_CLIENTE_FALSO] [INTERFACE]
+```
+
+Donde:
+
+- `-1`: Indica el modo de falsa autenticación.
+- `0`: Tiempo de reasociación en segundos (0 significa no reasociar automáticamente, se mantiene la asociación hasta que el AP la termine).
+- `-e [ESSID]`: El nombre de la red inalámbrica (ESSID).
+- `-a [MAC_AP]`: La dirección MAC del punto de acceso (BSSID).
+- `-h [MAC_CLIENTE_FALSO]`: La dirección MAC del cliente que vamos a añadir (mejor la de nuestra tarjeta).
+- `[INTERFACE]`: El nombre de la interfaz inalámbrica en modo monitor (ej. `ath0`, `wlan0mon`).
+
+Una variación útil para algunos APs, que envía paquetes de "sigo aquí" o "keep alive" para mantener la conexión:
+
+```bash
+aireplay-ng -1 6000 -o 1 -q 10 -e [ESSID] -a [MAC_AP] -h [MAC_CLIENTE_FALSO] [INTERFACE]
+```
+
+Donde:
+
+- `6000`: Reautentifica cada 6000 segundos. Esto también provoca el envío de paquetes "keep alive".
+- `-o 1`: Envía solo un tipo de paquetes a la vez, lo que puede ser útil para APs sensibles.
+- `-q 10`: Envía paquetes "keep alive" cada 10 segundos.
+
+### Pistas y Solución de Problemas
+
+- **Fijar la dirección MAC**: Es recomendable cambiar la dirección MAC de nuestra tarjeta inalámbrica para que coincida con la usada en el parámetro `-h`. Esto asegura que los paquetes ACK se envíen correctamente y mejora la efectividad del ataque. Es importante usar una dirección MAC de un fabricante inalámbrico válido para evitar que el AP la ignore.
+- **Identificación de autenticaciones fallidas**: Si `aireplay-ng` muestra mensajes como "Got a deauthentication packet!" o reintentos continuos, indica que la autenticación está fallando. Se puede usar `tcpdump` para analizar los paquetes y buscar mensajes de error como "DeAuthentication: Class 3 frame received from nonassociated station", lo que significa que el AP no aceptará los paquetes inyectados.
+- **Reasociación**: Algunos APs requieren reasociación periódica (ej. cada 30 segundos). En estos casos, es necesario fijar el periodo de reasociación en el comando `aireplay-ng`.
+- **Filtrado MAC**: Si la falsa autenticación nunca tiene éxito, el AP podría tener filtrado MAC activado. La solución es averiguar una dirección MAC válida de un cliente ya asociado (usando `airodump-ng`) y usarla. No se debe intentar la falsa autenticación con una MAC de un cliente activo.
