@@ -6,7 +6,8 @@
 - [[#3. Falsificación de nuestra dirección MAC y tips|# 3. Falsificación de nuestra dirección MAC y tips]]
 - [[#4. Uso de Airodump para efectuar un análisis del entorno (P.A.)|4. Uso de Airodump para efectuar un análisis del entorno (P.A.)]]
 - [[#5. Uso de Airodump para efectuar un análisis del entorno 2 (clientes)|5. Uso de Airodump para efectuar un análisis del entorno 2 (clientes)]]
----------------
+
+
 # Contenido Resumido y Ampliado del Curso
 
 ## 1. Modo monitor CONCEPTO
@@ -16,6 +17,7 @@ El modo monitor es fundamental para cualquier ataque a redes inalámbricas, ya q
 ### Explicación técnica:
 - **Definición**: El modo monitor es un estado especial de las tarjetas de red inalámbricas que permite capturar todos los paquetes sin estar asociado a ningún punto de acceso.
 - **Diferencia con modo normal**: En modo normal (managed), la tarjeta solo procesa paquetes dirigidos a su MAC.
+
 
 ## 2. Configuración de la tarjeta de red en modo monitor
 
@@ -154,7 +156,6 @@ airodump-ng wlan0mon
 - WPA con TKIP es vulnerable a ataques de reinstalación de clave (KRACK)
 - WPA2 con CCMP ofrece mejor seguridad pero sigue siendo vulnerable a ataques de fuerza bruta si la contraseña es débil
 
-
 ## 5. Uso de Airodump para efectuar un análisis del entorno 2 (clientes)
 
 ### Técnicas avanzadas:
@@ -182,6 +183,7 @@ airodump-ng wlan0mon
 - Los dispositivos iOS y Android recientes ocultan el SSID real en sus probe requests como medida de privacidad
 - La efectividad depende de la actividad de los clientes en la red
 
+
 ## 6. Modos de filtro con Airodump
 
 Este video explica las diferentes opciones de filtrado en Airodump-ng para optimizar la captura de información relevante y reducir el ruido.
@@ -195,6 +197,7 @@ Este video explica las diferentes opciones de filtrado en Airodump-ng para optim
 | Filtrado por BSSID (MAC del AP)    | `bash<br>airodump-ng --bssid 00:11:22:33:44:55 wlan0mon<br>`                            |
 | Filtrado por ESSID (nombre de red) | `bash<br>airodump-ng --essid "NombreDeRed" wlan0mon<br>`                                |
 | Combinación de filtros             | `bash<br>airodump-ng -c 6 --bssid 00:11:22:33:44:55 --essid "NombreDeRed" wlan0mon<br>` |
+
 
 ## 7. Exportación de evidencias con Airodump
 
@@ -231,6 +234,7 @@ airodump-ng -c 6 --bssid 00:11:22:33:44:55 -w captura --output-format pcap --wri
 - Estos filtros funcionan igual para redes WPA y WPA2
 - Para redes que utilizan band steering (cambio entre 2.4GHz y 5GHz), puede ser necesario monitorear múltiples canales
 
+
 ## 8. Concepto de HandShake
 
 ### Explicación técnica del handshake:
@@ -250,6 +254,7 @@ Durante este intercambio, el cliente y el punto de acceso (AP) **generan y verif
 - La única forma de obtener la contraseña es mediante fuerza bruta o diccionario
 - WPA con TKIP es vulnerable a ataques adicionales como el ataque Beck-Tews
 - WPA2 con CCMP es vulnerable a KRACK (Key Reinstallation Attack) en implementaciones específicas
+
 
 ## 9. Ataque de Deautenticación dirigido
 
@@ -283,6 +288,7 @@ Este video explica cómo realizar un ataque de deautenticación dirigido para fo
 - Algunos APs empresariales detectan ataques de deautenticación
 - WPA3 implementa protección contra este tipo de ataques
 - Este ataque es detectable por sistemas de detección de intrusiones inalámbricas (WIDS)
+
 
 ## 10. Ataque de Deautenticación global (Broadcast MAC Address)
 
@@ -356,6 +362,7 @@ Donde:
 - **Reasociación**: Algunos APs requieren reasociación periódica (ej. cada 30 segundos). En estos casos, es necesario fijar el periodo de reasociación en el comando `aireplay-ng`.
 - **Filtrado MAC**: Si la falsa autenticación nunca tiene éxito, el AP podría tener filtrado MAC activado. La solución es averiguar una dirección MAC válida de un cliente ya asociado (usando `airodump-ng`) y usarla. No se debe intentar la falsa autenticación con una MAC de un cliente activo.
 
+
 ## 11. Ataque de Falsa Autenticación
 
 ### Descripción del Ataque
@@ -397,6 +404,7 @@ Donde:
 - **Identificación de autenticaciones fallidas**: Si `aireplay-ng` muestra mensajes como "Got a deauthentication packet!" o reintentos continuos, indica que la autenticación está fallando. Se puede usar `tcpdump` para analizar los paquetes y buscar mensajes de error como "DeAuthentication: Class 3 frame received from nonassociated station", lo que significa que el AP no aceptará los paquetes inyectados.
 - **Reasociación**: Algunos APs requieren reasociación periódica (ej. cada 30 segundos). En estos casos, es necesario fijar el periodo de reasociación en el comando `aireplay-ng`.
 - **Filtrado MAC**: Si la falsa autenticación nunca tiene éxito, el AP podría tener filtrado MAC activado. La solución es averiguar una dirección MAC válida de un cliente ya asociado (usando `airodump-ng`) y usarla. No se debe intentar la falsa autenticación con una MAC de un cliente activo.
+
 
 ## 12 y 13. CTS Frame Attack (Secuestro del Ancho de Banda de una red)
 
