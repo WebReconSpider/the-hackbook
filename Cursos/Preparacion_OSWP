@@ -480,3 +480,38 @@ tcpreplay --intf1=wlan0mon --topspeed --loop=2000 <nombreCTSframe.pcap> 2>/dev/n
     - `--intf1`: la interfaz.
     - `--topspeed`: Envía las tramas a la máxima velocidad posible.
     - `--loop`: Especifica la cantidad de veces que se enviará la trama.
+
+## 14. Ataque Beacon Flood Mode
+
+### Descripción del Ataque
+
+El ataque Beacon Flood Mode (o inundación de balizas) es un tipo de ataque de denegación de servicio (DoS) que busca confundir a los clientes inalámbricos y, en algunos casos, a los escáneres de red y drivers, al transmitir un número masivo de tramas beacon falsas. Las tramas beacon son anuncios periódicos que los puntos de acceso (APs) legítimos envían para informar sobre la disponibilidad de la red, su SSID, canal, capacidades de seguridad, etc. Al inundar el entorno con miles de SSIDs falsos, el atacante satura la lista de redes disponibles que ven los usuarios, dificultando la conexión a redes legítimas o incluso causando inestabilidad en los dispositivos.
+
+### Funcionamiento y Herramientas
+
+La herramienta `mdk3` es comúnmente utilizada para realizar este ataque. El proceso implica:
+
+1. **Crear una interfaz en modo monitor**: Es necesario poner la tarjeta inalámbrica en modo monitor para poder inyectar las tramas beacon.
+    ```bash
+    airmon-ng start <INTERFACE>
+    ```
+
+2. **Crear un archivo de diccionario (opcional pero recomendado)**: Para hacer el ataque más efectivo y realista, se puede crear un archivo de texto (`ssid_names.txt`) con una lista de nombres de SSIDs falsos que se desean anunciar. Estos nombres pueden ser similares a redes existentes o simplemente aleatorios.
+    ```bash
+    nano ssid_names.txt
+    ```
+- Para hacerlo más simple:
+```bash
+for i in $(seq 1 10); do echo “MyNetwork$i” >> ssid_names  ; done
+```
+2. **Ejecutar el ataque con `mdk3`**: Se utiliza el modo `b` (beacon flooding) de `mdk3` junto con opciones para especificar el tipo de red (WPA2, velocidad, etc.) y el archivo de SSIDs.
+    ```bash
+    mdk3 <tarjetaRed> b -a -f ssid_names.txt -s 1000 -c CHANNEL
+    ```
+- `b`: Activa el modo Beacon Flood.
+- `-a`: Anuncia redes WPA2.
+- `-s 1000`: Establece la velocidad de envío de beacons
+- `-g`: Anuncia redes WPA/WPA2-encrypted (simulan estar más protegidas)
+- `-f ssid_names.txt`: Utiliza el archivo de diccionario con los nombres de los SSIDs falsos.
+### Impacto y Detección
+ Los sistemas de detección y prevención de intrusiones inalámbricas (WIDS/WIPS) suelen detectar este tipo de ataques debido al alto volumen de tramas beacon inusuales, lo que puede activar alertas y contramedidas.
