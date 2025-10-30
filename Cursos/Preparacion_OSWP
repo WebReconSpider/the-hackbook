@@ -515,3 +515,33 @@ for i in $(seq 1 10); do echo “MyNetwork$i” >> ssid_names  ; done
 - `-f ssid_names.txt`: Utiliza el archivo de diccionario con los nombres de los SSIDs falsos.
 ### Impacto y Detección
  Los sistemas de detección y prevención de intrusiones inalámbricas (WIDS/WIPS) suelen detectar este tipo de ataques debido al alto volumen de tramas beacon inusuales, lo que puede activar alertas y contramedidas.
+
+## 15. Ataque Disassociation Amok Mode
+
+### Descripción del Ataque
+
+El ataque Disassociation Amok Mode es una forma de ataque de denegación de servicio (DoS) que busca desconectar a todos los clientes de una red inalámbrica específica. Utiliza tramas de desasociación (disassociation frames) y desautenticación (deauthentication frames) para forzar a los dispositivos a desconectarse del punto de acceso (AP). Aunque es similar a un ataque de desautenticación dirigido, el "Amok Mode" de herramientas como `mdk3` o `mdk4` se refiere a un modo más agresivo y generalizado, donde se intenta desconectar a todos los clientes encontrados en el rango de la red objetivo.
+
+### Funcionamiento y Herramientas
+
+La herramienta `mdk3` es la principal para este ataque. El modo `d` (Deauthentication / Disassociation Amok Mode) es el que se utiliza.
+
+1. Poner la interfaz en modo monitor: Al igual que en otros ataques de inyección, la tarjeta inalámbrica debe estar en modo monitor.
+2. Capturamos con `airodump-ng <nombTarjeta>`
+3. Elegimos la red a atacar `airodump-ng -c <canal> -w <nombDoc> —bssid <BSSID> <nombTarjeta>`
+4. Creamos un documento 
+	- (blacklist -b) `nano <nombBlacklist>` y escribimos todas las direcciones mac que queremos expulsar
+	- (whitelist -w) `nano <nombWhitelist>` y escribimos las direcciones mac que NO queremos expulsar
+5. Ejecutar el ataque con `mdk3` : 
+    ```bash
+    mdk3 MONITOR_INTERFACE d -a [MAC_AP]  -w <nombDoc> -c [CHANNEL]
+    ```
+    - `MONITOR_INTERFACE`: El nombre de la interfaz en modo monitor.
+    - `d`: Activa el modo Deauthentication / Disassociation Amok.
+    - `-a [MAC_AP]` : La dirección MAC del AP objetivo. Si no se especifica, puede intentar desautenticar a todos los clientes de todos los APs en el rango.
+    - `-c [CHANNEL]` (opcional): El canal en el que opera la red objetivo.
+    - `-w`: client whitelist -> Desconecta todos menos estos.
+
+### Impacto y Detección
+
+El ataque Disassociation Amok Mode es un ataque de DoS muy efectivo que interrumpe la conectividad de los usuarios. Puede generar una gran cantidad de tráfico de gestión y saturar la red. Al ser un ataque activo, es detectable por sistemas WIDS/WIPS.
