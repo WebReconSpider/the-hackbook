@@ -561,3 +561,31 @@ La herramienta `mdk3` es la principal para este ataque. El modo `d` (Deauthentic
 ### Impacto y Detección
 
 El ataque Disassociation Amok Mode es un ataque de DoS muy efectivo que interrumpe la conectividad de los usuarios. Puede generar una gran cantidad de tráfico de gestión y saturar la red. Al ser un ataque activo, es detectable por sistemas WIDS/WIPS.
+
+## 16. Ataque Michael Shutdown Exploitation (Apagado de un Router en remoto)
+
+### Descripción del Ataque
+
+El ataque Michael Shutdown Exploitation es una vulnerabilidad que afecta al protocolo **TKIP** (Temporal Key Integrity Protocol), utilizado principalmente en redes Wi-Fi protegidas con **WPA** (Wi-Fi Protected Access) de primera generación. TKIP fue diseñado como una mejora de seguridad para WEP, pero se descubrió que era vulnerable a ciertos ataques criptográficos. El ataque Michael explota una debilidad en el algoritmo de integridad de mensajes (MIC) de TKIP. Si se detectan dos fallos de integridad de mensajes en un corto período de tiempo, el protocolo WPA está diseñado para activar un "apagado" o "cierre" de la red (Michael Shutdown) para evitar ataques de inyección de paquetes, lo que resulta en una denegación de servicio (DoS) al apagar el router de acceso de forma remota durante un período de tiempo (unos 60 segundos).
+
+Este ataque no permite descifrar la clave WPA, sino que provoca una interrupción del servicio al forzar al AP a reiniciarse o a dejar de transmitir temporalmente como medida de seguridad.
+
+### Funcionamiento y Herramientas
+
+1. **Poner la interfaz en modo monitor**: Como en los casos anteriores, la tarjeta inalámbrica debe estar en modo monitor.
+2. usamos `airodump-ng <nombTarjeta>` para seleccionar el PA a atacar
+3. **Ejecutar el ataque con `mdk3`**: Se especifica la interfaz en modo monitor y el modo `m`.
+    ```bash
+    mdk3 MONITOR_INTERFACE m -a [MAC_AP] -c [CHANNEL]
+    ```
+    - `MONITOR_INTERFACE`: El nombre de la interfaz en modo monitor.
+    - `m`: Activa el modo Michael shutdown exploitation.
+    - `-a [MAC_AP]` : La dirección MAC del AP objetivo.
+    - `-c [CHANNEL]` (opcional): El canal en el que opera la red objetivo.
+
+El ataque funciona inyectando paquetes con errores de integridad Michael. Cuando el AP detecta un número predefinido de estos errores (normalmente dos) en un corto intervalo, activa la contramedida de apagado para proteger la red.
+
+### Versiones Afectadas
+
+**Este ataque afecta a redes que utilizan el cifrado WPA con TKIP.** Las redes WPA2 y WPA3 que utilizan AES-CCMP (Advanced Encryption Standard - Counter Mode with CBC-MAC Protocol) no son vulnerables a este ataque, ya que AES es un algoritmo de cifrado más robusto y no utiliza el algoritmo Michael. 
+
