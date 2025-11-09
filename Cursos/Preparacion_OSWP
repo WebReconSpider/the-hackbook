@@ -589,3 +589,9 @@ El ataque funciona inyectando paquetes con errores de integridad Michael. Cuando
 
 **Este ataque afecta a redes que utilizan el cifrado WPA con TKIP.** Las redes WPA2 y WPA3 que utilizan AES-CCMP (Advanced Encryption Standard - Counter Mode with CBC-MAC Protocol) no son vulnerables a este ataque, ya que AES es un algoritmo de cifrado más robusto y no utiliza el algoritmo Michael. 
 
+## 17. Técnicas pasivas de explotación
+
+### Descripción de las Técnicas Pasivas
+
+Las técnicas pasivas de explotación en redes inalámbricas se refieren a métodos de recolección de información que no implican la inyección de paquetes en la red ni la interacción directa con los dispositivos. El objetivo principal es escuchar y analizar el tráfico de la red sin ser detectado, obteniendo datos valiosos que pueden ser utilizados posteriormente para ataques activos o para comprender la estructura y el comportamiento de la red. Estas técnicas son "silenciosas" y no generan alertas en los sistemas de detección de intrusiones, lo que las hace muy útiles para la fase de reconocimiento.
+
