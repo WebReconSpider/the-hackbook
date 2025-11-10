@@ -595,3 +595,16 @@ El ataque funciona inyectando paquetes con errores de integridad Michael. Cuando
 
 Las técnicas pasivas de explotación en redes inalámbricas se refieren a métodos de recolección de información que no implican la inyección de paquetes en la red ni la interacción directa con los dispositivos. El objetivo principal es escuchar y analizar el tráfico de la red sin ser detectado, obteniendo datos valiosos que pueden ser utilizados posteriormente para ataques activos o para comprender la estructura y el comportamiento de la red. Estas técnicas son "silenciosas" y no generan alertas en los sistemas de detección de intrusiones, lo que las hace muy útiles para la fase de reconocimiento.
 
+
+## 18. Instalación compilación y validación del HandShake con Pyrit (NO FUNCIONA)
+
+### Descripción de Pyrit
+
+Pyrit es una herramienta diseñada para averiguar si han sido capturados handshakes y para crear bases de datos masivas de PMKs (Pairwise Master Keys) precalculadas para la fase de autenticación WPA/WPA2-PSK. Su principal ventaja es que aprovecha la potencia computacional de CPUs multinúcleo y GPUs para acelerar significativamente el proceso de cracking de contraseñas. En lugar de calcular el PMK para cada contraseña en tiempo real durante un ataque de fuerza bruta, Pyrit precalcula y almacena estos PMKs, lo que permite un ataque mucho más rápido una vez que se ha capturado un handshake.
+
+### Instalación y Compilación
+
+1. **Clonar el repositorio**: `git clone https://github.com/JPaulMora/Pyrit.git`
+2. **Instalar dependencias**: Pyrit requiere varias librerías, incluyendo OpenSSL, libpcap, y las SDKs para CUDA/OpenCL si se desea usar aceleración por GPU.
+3. **Compilar**: Navegar al directorio de Pyrit y ejecutar el comando de compilación (ej. `python setup.py build` o `make` ).
+4. **Instalar**: `sudo python setup.py install`.
