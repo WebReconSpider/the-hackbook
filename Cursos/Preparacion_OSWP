@@ -608,3 +608,21 @@ Pyrit es una herramienta diseñada para averiguar si han sido capturados handsha
 2. **Instalar dependencias**: Pyrit requiere varias librerías, incluyendo OpenSSL, libpcap, y las SDKs para CUDA/OpenCL si se desea usar aceleración por GPU.
 3. **Compilar**: Navegar al directorio de Pyrit y ejecutar el comando de compilación (ej. `python setup.py build` o `make` ).
 4. **Instalar**: `sudo python setup.py install`.
+
+# 19. Análisis de los paquetes Probe Request
+
+### Descripción de los Paquetes Probe Request
+
+Los paquetes Probe Request (solicitud de sondeo) son un tipo de trama de gestión en redes inalámbricas. Son enviados por los clientes (dispositivos como teléfonos, laptops, etc.) para descubrir redes Wi-Fi disponibles en su entorno. A diferencia de las tramas beacon (que son enviadas por los APs para anunciar su presencia), los Probe Requests son iniciados por el cliente.
+
+Existen dos tipos principales de Probe Requests:
+
+1. **Probe Request con SSID específico**: El cliente envía una solicitud buscando un SSID particular (el nombre de una red a la que se ha conectado previamente o que tiene en su lista de redes preferidas). Esta es una forma de escaneo activo.
+2. **Probe Request con SSID nulo (broadcast)**: El cliente envía una solicitud genérica para descubrir cualquier red disponible, sin especificar un SSID. Esto es común cuando el cliente busca redes nuevas o cuando el SSID de una red conocida no está siendo transmitido por el AP.
+
+### Información Contenida y su Explotación
+
+Los paquetes Probe Request no están cifrados y contienen información valiosa que puede ser explotada por un atacante:
+
+
+continuar 
