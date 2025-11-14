@@ -624,5 +624,8 @@ Existen dos tipos principales de Probe Requests:
 
 Los paquetes Probe Request no están cifrados y contienen información valiosa que puede ser explotada por un atacante:
 
-
-continuar 
+- **SSID (en claro)**: Si el cliente busca un SSID específico, este se transmite en texto plano. Esto significa que un atacante puede ver los nombres de todas las redes a las que un dispositivo se ha conectado en el pasado, incluso si esas redes no están actualmente en el rango o tienen su SSID oculto.
+- **Dirección MAC del cliente**: La dirección MAC del dispositivo que envía el Probe Request también se transmite en claro. Esto permite al atacante identificar y rastrear dispositivos individuales. Aunque la "MAC randomization" (aleatorización de MAC) se ha implementado en muchos dispositivos modernos para mitigar esto, no siempre es completamente efectiva.
+- **Fabricante del dispositivo**: La primera parte de la dirección MAC (OUI - Organizationally Unique Identifier) puede revelar el fabricante del dispositivo, lo que puede dar pistas sobre el tipo de dispositivo o sistema operativo.
+### Herramienta para el Análisis
+**Wireshark**: Ofrece un análisis detallado de los paquetes, permitiendo aplicar filtros específicos (`wlan.fc.type_subtype == 0x04` para Probe Requests) para examinar su contenido
