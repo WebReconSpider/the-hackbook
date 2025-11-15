@@ -629,3 +629,22 @@ Los paquetes Probe Request no están cifrados y contienen información valiosa q
 - **Fabricante del dispositivo**: La primera parte de la dirección MAC (OUI - Organizationally Unique Identifier) puede revelar el fabricante del dispositivo, lo que puede dar pistas sobre el tipo de dispositivo o sistema operativo.
 ### Herramienta para el Análisis
 **Wireshark**: Ofrece un análisis detallado de los paquetes, permitiendo aplicar filtros específicos (`wlan.fc.type_subtype == 0x04` para Probe Requests) para examinar su contenido
+
+## 20. Análisis de los paquetes Probe Response
+
+### Descripción de los Paquetes Probe Response
+
+Los paquetes Probe Response (respuesta de sondeo) son tramas de gestión en redes inalámbricas que son enviadas por un punto de acceso (AP) en respuesta a un paquete Probe Request recibido de un cliente. Cuando un cliente envía un Probe Request (ya sea buscando un SSID específico o un SSID nulo), cualquier AP que reciba esa solicitud y que pueda satisfacerla (es decir, que tenga el SSID solicitado o que esté dispuesto a responder a una solicitud genérica) enviará un Probe Response.
+
+### Información Contenida y su Explotación
+
+Al igual que los Probe Requests, los paquetes Probe Response no están cifrados y contienen información crucial sobre el punto de acceso y la red:
+
+- **SSID (nombre de red)**: El nombre de la red que el AP está anunciando.
+- **BSSID (dirección MAC del AP)**: La dirección MAC del punto de acceso.
+- **Canal de operación**: El canal en el que opera el AP.
+- **Capacidades de seguridad**: Información sobre el tipo de cifrado y autenticación soportados por el AP (WEP, WPA, WPA2, WPA3, TKIP, AES, etc.).
+- **Tasas de transmisión soportadas**: Las velocidades de datos que el AP puede manejar.
+- **Otros parámetros de red**: Como el intervalo de baliza, capacidades de QoS, etc.
+
+La explotación de los Probe Responses se realiza mediante la **escucha pasiva** y el análisis de estos paquetes. Un atacante puede:
