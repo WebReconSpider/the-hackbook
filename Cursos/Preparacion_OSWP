@@ -648,3 +648,10 @@ Al igual que los Probe Requests, los paquetes Probe Response no están cifrados 
 - **Otros parámetros de red**: Como el intervalo de baliza, capacidades de QoS, etc.
 
 La explotación de los Probe Responses se realiza mediante la **escucha pasiva** y el análisis de estos paquetes. Un atacante puede:
+
+- **Mapear la red**: Obtener una visión completa de los APs presentes en el entorno, sus SSIDs, BSSIDs, canales y configuraciones de seguridad. Esto es fundamental para la fase de reconocimiento.
+- **Identificar vulnerabilidades**: Al conocer el tipo de cifrado y las capacidades de seguridad, el atacante puede identificar redes que utilizan protocolos más débiles (como WEP o WPA/TKIP) que son más fáciles de explotar.
+- **Preparar ataques dirigidos**: La información obtenida de los Probe Responses permite al atacante configurar sus herramientas para ataques específicos (ej. un ataque de desautenticación contra un AP particular o un ataque de fuerza bruta contra una red WPA2).
+- **Detectar APs falsos (Rogue APs)**: Analizando los Probe Responses, se pueden identificar APs que no deberían estar presentes en la red o que tienen configuraciones sospechosas.
+### Herramienta para el Análisis
+**Wireshark**: Permite un análisis profundo de los paquetes Probe Response, aplicando filtros específicos (`wlan.fc.type_subtype == 0x05` para Probe Responses) para inspeccionar todos sus campos.
