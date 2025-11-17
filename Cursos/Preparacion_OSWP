@@ -655,3 +655,21 @@ La explotación de los Probe Responses se realiza mediante la **escucha pasiva**
 - **Detectar APs falsos (Rogue APs)**: Analizando los Probe Responses, se pueden identificar APs que no deberían estar presentes en la red o que tienen configuraciones sospechosas.
 ### Herramienta para el Análisis
 **Wireshark**: Permite un análisis profundo de los paquetes Probe Response, aplicando filtros específicos (`wlan.fc.type_subtype == 0x05` para Probe Responses) para inspeccionar todos sus campos.
+
+
+### Información Contenida y su Explotación
+
+Los paquetes Association Request, aunque no suelen ser directamente explotables para un ataque de denegación de servicio o acceso no autorizado, son valiosos en la fase de reconocimiento pasivo. Contienen información en texto claro que puede ser analizada por un atacante:
+
+•Dirección MAC del cliente: Identifica de forma única el dispositivo que intenta asociarse.
+•SSID al que se intenta asociar: El nombre de la red a la que el cliente desea unirse.
+•Capacidades soportadas por el cliente: Incluye las tasas de transmisión de datos (data rates) que el cliente puede manejar, los estándares 802.11 soportados (a/b/g/n/ac/ax), y las capacidades de seguridad (cifrado y autenticación) que el cliente prefiere o soporta.
+
+La explotación de esta información se centra en:
+•Mapeo de la red: Permite al atacante identificar qué clientes se están conectando a qué APs, y qué tipo de dispositivos son (por sus capacidades y dirección MAC).
+•Identificación de vulnerabilidades: Al conocer las capacidades de seguridad del cliente, un atacante puede inferir si el cliente es compatible con protocolos de seguridad más débiles (aunque esto es menos común hoy en día con WPA2/WPA3).
+•Preparación de ataques dirigidos: La información sobre las tasas de transmisión y estándares soportados puede ser útil para optimizar ataques de denegación de servicio o para configurar un AP falso que sea compatible con el cliente objetivo.
+
+### Herramienta para el Análisis
+
+Wireshark: Es la herramienta principal para analizar estos paquetes. Se puede aplicar un filtro como wlan.fc.type_subtype == 0x00 (o wlan.fc.type == 0 && wlan.fc.subtype == 0) para capturar solo las tramas Association Request. Wireshark permite inspeccionar todos los campos de la trama para extraer la información mencionada
