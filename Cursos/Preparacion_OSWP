@@ -656,6 +656,11 @@ La explotación de los Probe Responses se realiza mediante la **escucha pasiva**
 ### Herramienta para el Análisis
 **Wireshark**: Permite un análisis profundo de los paquetes Probe Response, aplicando filtros específicos (`wlan.fc.type_subtype == 0x05` para Probe Responses) para inspeccionar todos sus campos.
 
+## 21. Análisis de los paquetes Association Request
+
+### Descripción de los Paquetes Association Request
+
+Los paquetes Association Request (solicitud de asociación) son tramas de gestión fundamentales en el proceso de conexión de un cliente a una red Wi-Fi. Después de que un cliente ha descubierto un punto de acceso (AP) a través de tramas Beacon o Probe Response, y ha completado la fase de autenticación (que puede ser abierta o compartida), envía un paquete Association Request al AP para solicitar formalmente unirse a la red. Este paquete contiene información crucial sobre las capacidades del cliente.
 
 ### Información Contenida y su Explotación
 
