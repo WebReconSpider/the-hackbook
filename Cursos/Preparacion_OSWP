@@ -678,3 +678,27 @@ La explotación de esta información se centra en:
 ### Herramienta para el Análisis
 
 Wireshark: Es la herramienta principal para analizar estos paquetes. Se puede aplicar un filtro como wlan.fc.type_subtype == 0x00 (o wlan.fc.type == 0 && wlan.fc.subtype == 0) para capturar solo las tramas Association Request. Wireshark permite inspeccionar todos los campos de la trama para extraer la información mencionada
+
+## 22. Análisis de los paquetes Association Response
+
+### Descripción de los Paquetes Association Response
+
+Los paquetes Association Response (respuesta de asociación) son tramas de gestión enviadas por un punto de acceso (AP) en respuesta a un paquete Association Request de un cliente. Este paquete es la confirmación del AP de que ha aceptado la solicitud del cliente para unirse a la red. Si la asociación es exitosa, el cliente puede comenzar a enviar y recibir tráfico de datos a través del AP. Si la asociación es rechazada, el paquete Association Response incluirá un código de estado que indica la razón del rechazo.
+
+### Información Contenida y su Explotación
+
+Los paquetes Association Response son cruciales para entender el estado de la conexión entre un cliente y un AP. Al igual que otras tramas de gestión, no están cifrados y pueden ser analizados pasivamente para obtener información valiosa:
+
+•Dirección MAC del AP y del cliente: Confirma la identidad de ambos dispositivos en la asociación.
+•Código de estado: Indica si la asociación fue exitosa o no, y en caso de fallo, la razón (ej. autenticación fallida, capacidades no soportadas, etc.).
+•Capacidades soportadas por el AP: Incluye las tasas de transmisión de datos, los estándares 802.11 soportados, y las capacidades de seguridad que el AP ha negociado con el cliente.
+•AID (Association ID): Un identificador único asignado al cliente por el AP para esa sesión de asociación.
+
+La explotación de esta información se centra en:
+•Diagnóstico de problemas de conexión: Un atacante puede monitorear los Association Responses para identificar problemas en la red, como clientes que no pueden asociarse o APs que rechazan asociaciones.
+•Mapeo de la red: Complementa la información obtenida de los Association Requests, proporcionando una imagen más completa de las asociaciones activas en la red.
+•Identificación de configuraciones de seguridad: Al observar las capacidades de seguridad anunciadas por el AP en el Association Response, un atacante puede confirmar los protocolos de cifrado y autenticación en uso.
+
+### Herramientas para el Análisis
+
+•Wireshark: Permite un análisis detallado de los paquetes Association Response. Se puede usar un filtro como wlan.fc.type_subtype == 0x01 (o wlan.fc.type == 0 && wlan.fc.subtype == 1) para capturar estas tramas. La inspección de los campos de la trama, especialmente el código de estado, es fundamental.
