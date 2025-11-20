@@ -702,3 +702,36 @@ La explotación de esta información se centra en:
 ### Herramientas para el Análisis
 
 •Wireshark: Permite un análisis detallado de los paquetes Association Response. Se puede usar un filtro como wlan.fc.type_subtype == 0x01 (o wlan.fc.type == 0 && wlan.fc.subtype == 1) para capturar estas tramas. La inspección de los campos de la trama, especialmente el código de estado, es fundamental.
+
+
+## 23. Análisis de paquetes Beacon
+
+### Descripción de los Paquetes Beacon
+
+Los paquetes Beacon son tramas de gestión fundamentales en redes inalámbricas 802.11. Son enviados periódicamente por los puntos de acceso (APs) para anunciar su presencia y las características de la red que ofrecen. Permite a los clientes inalámbricos descubrir redes disponibles de forma pasiva, sin necesidad de enviar ninguna solicitud. Cada AP transmite tramas Beacon a intervalos regulares (generalmente cada 100 milisegundos).
+
+### Información Contenida y su Explotación
+
+Los paquetes Beacon no están cifrados y contienen una gran cantidad de información sobre la red, lo que los convierte en una fuente rica para el reconocimiento pasivo por parte de un atacante:
+
+•SSID (Service Set Identifier): El nombre de la red Wi-Fi. Si el SSID está oculto, el campo correspondiente estará vacío o contendrá un valor nulo, pero el AP seguirá enviando Beacons.
+•BSSID (Basic Service Set Identifier): La dirección MAC del punto de acceso, que identifica de forma única al AP.
+•Canal de operación: El canal de frecuencia en el que opera la red.
+•Capacidades de seguridad: Información sobre el tipo de cifrado y autenticación utilizados por la red (WEP, WPA, WPA2, WPA3, TKIP, AES, etc.). Esto es crucial para que un atacante determine la robustez de la seguridad de la red.
+•Tasas de transmisión soportadas: Las velocidades de datos que el AP puede manejar.
+•Intervalo de baliza: La frecuencia con la que el AP envía las tramas Beacon.
+•Timestamp: Un valor de tiempo que permite a los clientes sincronizarse con el AP.
+•Information Elements (IEs): Campos adicionales que pueden contener información variada, como el país de operación, soporte para QoS, etc.
+
+La explotación de los paquetes Beacon se centra en:
+
+•Mapeo de la red: Permite al atacante construir un mapa completo de todas las redes Wi-Fi visibles en un área, incluyendo sus nombres, direcciones MAC, canales y configuraciones de seguridad.
+•Identificación de redes objetivo: Facilita la selección de redes con seguridad más débil o con configuraciones interesantes para ataques posteriores.
+•Detección de APs falsos (Rogue APs): Al analizar los Beacons, se pueden identificar APs que no deberían estar presentes o que tienen configuraciones sospechosas (ej. un AP con un SSID conocido pero con una MAC diferente).
+•Análisis de la congestión del canal: El número de Beacons en un canal puede indicar el nivel de actividad y congestión, lo que es útil para planificar ataques de denegación de servicio.
+
+### Herramientas para el Análisis
+
+•airodump-ng: Es la herramienta por excelencia para capturar y mostrar información de los paquetes Beacon. Muestra el BSSID, ESSID, canal, tipo de cifrado, y el número de Beacons capturados.
+
+•Wireshark: Permite un análisis profundo de los paquetes Beacon. Se puede usar un filtro como wlan.fc.type_subtype == 0x08 (o wlan.fc.type == 0 && wlan.fc.subtype == 8) para capturar estas tramas y examinar todos sus campos detalladamente. Para observar los campos, se puede usar la opción `-Tjson`
