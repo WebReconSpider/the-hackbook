@@ -735,3 +735,32 @@ La explotación de los paquetes Beacon se centra en:
 •airodump-ng: Es la herramienta por excelencia para capturar y mostrar información de los paquetes Beacon. Muestra el BSSID, ESSID, canal, tipo de cifrado, y el número de Beacons capturados.
 
 •Wireshark: Permite un análisis profundo de los paquetes Beacon. Se puede usar un filtro como wlan.fc.type_subtype == 0x08 (o wlan.fc.type == 0 && wlan.fc.subtype == 8) para capturar estas tramas y examinar todos sus campos detalladamente. Para observar los campos, se puede usar la opción `-Tjson`
+
+## 24. Análisis de paquetes de Autenticación
+
+### Descripción de los Paquetes de Autenticación
+
+Los paquetes de Autenticación son tramas de gestión en redes inalámbricas 802.11 que inician el proceso de conexión entre un cliente y un punto de acceso (AP). Antes de que un cliente pueda asociarse a una red y comenzar a enviar/recibir datos, debe autenticarse con el AP. Existen dos tipos principales:
+
+1.Open System Authentication (Sistema Abierto): Es el método más simple y común. El cliente envía un paquete de autenticación al AP, y el AP responde con un paquete de autenticación exitosa. No hay intercambio de credenciales en esta fase; la autenticación es meramente una formalidad. La seguridad real se establece en la fase de asociación y cifrado (WEP, WPA, WPA2, WPA3).
+
+2.Shared Key Authentication (Clave Compartida): Utilizado principalmente con WEP. El AP envía un texto de desafío al cliente, el cliente lo cifra con la clave WEP y lo envía de vuelta al AP. El AP descifra el texto y verifica si coincide con el original. Este método es vulnerable y rara vez se usa hoy en día.
+
+### Información Contenida y su Explotación
+
+Los paquetes de Autenticación, al ser tramas de gestión, no están cifrados y pueden ser interceptados y analizados pasivamente. La información que contienen es valiosa para el reconocimiento:
+
+•Dirección MAC del cliente y del AP: Identifica a los participantes en el proceso de autenticación.
+•Algoritmo de autenticación: Indica si se está utilizando Open System o Shared Key.
+•Código de estado: En el paquete de respuesta, indica si la autenticación fue exitosa o fallida y la razón.
+
+La explotación de estos paquetes se centra en:
+
+•Identificación de redes WEP: Si se observa Shared Key Authentication, es un claro indicio de que la red utiliza WEP, un protocolo de seguridad obsoleto y vulnerable.
+•Detección de intentos de conexión: Permite al atacante ver qué clientes están intentando conectarse a qué redes.
+•Ataques de falsa autenticación: Como se vio en el Video 11, un atacante puede enviar paquetes de autenticación falsos para engañar al AP y obtener una asociación, lo que es útil para otros ataques.
+•Análisis de fallos de autenticación: Si un cliente falla repetidamente en la autenticación, puede indicar problemas de configuración o intentos de acceso no autorizados.
+
+### Herramientas para el Análisis
+
+•Wireshark: Permite capturar y analizar los paquetes de Autenticación. Se puede usar un filtro como wlan.fc.type_subtype == 0x0b (o wlan.fc.type == 0 && wlan.fc.subtype == 11) para las solicitudes de autenticación y wlan.fc.type_subtype == 0x0b para las respuestas. La inspección de los campos de la trama revelará el algoritmo y el estado.
