@@ -764,3 +764,11 @@ La explotación de estos paquetes se centra en:
 ### Herramientas para el Análisis
 
 •Wireshark: Permite capturar y analizar los paquetes de Autenticación. Se puede usar un filtro como wlan.fc.type_subtype == 0x0b (o wlan.fc.type == 0 && wlan.fc.subtype == 11) para las solicitudes de autenticación y wlan.fc.type_subtype == 0x0b para las respuestas. La inspección de los campos de la trama revelará el algoritmo y el estado.
+
+## 25. Análisis de paquetes de Deautenticación
+
+### Descripción de los Paquetes de Deautenticación
+
+Los paquetes de Deautenticación son tramas de gestión en redes inalámbricas 802.11 que se utilizan para desconectar un cliente de un punto de acceso (AP) o viceversa. Son una parte legítima del protocolo Wi-Fi, permitiendo que un dispositivo termine su conexión de forma controlada. Sin embargo, estos paquetes son la base de uno de los ataques de denegación de servicio (DoS) más comunes y efectivos en redes Wi-Fi: el ataque de desautenticación.
+
+### Información Contenida y su Explotación
