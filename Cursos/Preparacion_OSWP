@@ -772,3 +772,22 @@ La explotación de estos paquetes se centra en:
 Los paquetes de Deautenticación son tramas de gestión en redes inalámbricas 802.11 que se utilizan para desconectar un cliente de un punto de acceso (AP) o viceversa. Son una parte legítima del protocolo Wi-Fi, permitiendo que un dispositivo termine su conexión de forma controlada. Sin embargo, estos paquetes son la base de uno de los ataques de denegación de servicio (DoS) más comunes y efectivos en redes Wi-Fi: el ataque de desautenticación.
 
 ### Información Contenida y su Explotación
+
+Los paquetes de Deautenticación no están cifrados y contienen la siguiente información:
+
+•Dirección MAC del remitente y del receptor: Identifica al AP y al cliente involucrados en la desconexión.
+•Razón de la desconexión: Un código que indica el motivo por el cual se está enviando el paquete de desautenticación (ej. cliente inactivo, AP sobrecargado, etc.)
+
+La explotación de estos paquetes se realiza principalmente a través del ataque de desautenticación:
+
+•Denegación de Servicio (DoS): Un atacante puede falsificar paquetes de desautenticación y enviarlos desde la dirección MAC del AP al cliente, o desde la dirección MAC del cliente al AP. Esto hace que el cliente se desconecte de la red. Si se envían continuamente, el cliente no podrá mantener una conexión estable, lo que resulta en una denegación de servicio.
+•Captura de Handshake: El ataque de desautenticación es una técnica común para forzar a un cliente a reconectarse a la red. Durante esta reconexión, se produce el 4-way handshake de WPA/WPA2, que es esencial para el cracking de contraseñas. Al desconectar a un cliente legítimo, el atacante puede capturar este handshake y luego intentar descifrar la contraseña de la red offline.
+•Ataques Man-in-the-Middle (MitM): Al desconectar a un cliente de su AP legítimo, un atacante puede intentar que el cliente se conecte a un AP falso controlado por el atacante, facilitando un ataque MitM.
+
+### Herramientas para el Análisis y Ejecución
+
+•aireplay-ng: Parte de la suite Aircrack-ng, es la herramienta más utilizada para ejecutar ataques de desautenticación. 
+
+•mdk3 / mdk4: También pueden realizar ataques de desautenticación en modo "Amok" (Video 15).
+
+•Wireshark: Permite capturar y analizar los paquetes de Deautenticación. Se puede usar un filtro como wlan.fc.type_subtype == 0x0c (o wlan.fc.type == 0 && wlan.fc.subtype == 12) para inspeccionar estos paquetes y verificar su origen y destino
