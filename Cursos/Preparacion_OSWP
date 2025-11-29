@@ -813,3 +813,43 @@ La explotación de estos paquetes se realiza principalmente a través del **ataq
 -   **`aireplay-ng`**: Parte de la suite Aircrack-ng, puede ser utilizada para enviar paquetes de desasociación.
 -   **`mdk3` / `mdk4`**: También pueden realizar ataques de desasociación en modo "Amok".
 -   **Wireshark**: Permite capturar y analizar los paquetes de Desasociación. Se puede usar un filtro como `wlan.fc.type_subtype == 0x0a` (o `wlan.fc.type == 0 && wlan.fc.subtype == 10`) para inspeccionar estos paquetes y verificar su origen y destino.
+
+## 27. Extracción del Hash en el HandShake con Aircrack
+
+### Descripción de la Extracción del Hash (Handshake)
+La extracción del hash en el handshake es un paso crucial en el proceso de cracking de contraseñas WPA/WPA2-PSK. El "hash" al que se refiere el video es, en realidad, el Pairwise Master Key (PMK) o el Pairwise Transient Key (PTK) derivado durante el 4-way handshake. Para crackear la contraseña de una red WPA/WPA2, no se necesita la contraseña en sí, sino una captura completa de este handshake, que contiene la información necesaria para realizar un ataque de fuerza bruta o diccionario offline.
+
+### Funcionamiento y Herramientas (`airodump-ng` y `aireplay-ng`)
+El proceso de extracción del handshake generalmente implica:
+
+1.  **Poner la interfaz en modo monitor**: La tarjeta inalámbrica debe estar en modo monitor para poder capturar todo el tráfico de la red.
+    ```bash
+    airmon-ng start [INTERFACE]
+    ```
+2.  **Capturar el tráfico con `airodump-ng`**: Se utiliza `airodump-ng` para escanear la red, identificar el AP objetivo y los clientes conectados, y capturar el handshake. Es fundamental que un cliente se conecte o reconecte a la red para que se genere el handshake.
+    ```bash
+    airodump-ng -c [CANAL] --bssid [MAC_AP] -w [NOMBRE_ARCHIVO] [INTERFACE_MONITOR]
+    ```
+    - `-c [CANAL]`: El canal en el que opera el AP objetivo.
+    - `--bssid [MAC_AP]`: La dirección MAC del AP objetivo.
+    - `-w [NOMBRE_ARCHIVO]`: Prefijo para el archivo de captura (ej. `captura_wpa`). Esto creará archivos `.cap`, `.csv`, etc.
+    - `[INTERFACE_MONITOR]`: La interfaz inalámbrica en modo monitor.
+
+3.  **Forzar la desconexión de un cliente. Esto forzará al cliente a reconectarse, generando un nuevo handshake que `airodump-ng` capturará.
+    ```bash
+    aireplay-ng --deauth 0 -a [MAC_AP] -c [MAC_CLIENTE] [INTERFACE_MONITOR]
+    ```
+    - `--deauth 0`: Envía paquetes de desautenticación continuamente (0 significa ilimitado).
+    - `-a [MAC_AP]`: Dirección MAC del AP objetivo.
+    - `-c [MAC_CLIENTE]`: Dirección MAC de un cliente conectado al AP.
+
+Una vez que `airodump-ng` detecta y captura el handshake, aparecerá un mensaje como "WPA handshake: [MAC_AP]" en la parte superior derecha de la pantalla. El handshake se guardará en el archivo `.cap` generado.
+
+### Verificación del Handshake
+Es crucial verificar que el handshake capturado sea válido antes de intentar crackearlo. Esto se puede hacer con `aircrack-ng` o `pyrit`:
+
+```bash
+aircrack-ng [NOMBRE_ARCHIVO].cap
+```
+
+Si el handshake es válido, `aircrack-ng` lo reconocerá y estará listo para un ataque de diccionario. Si no es válido, se deberá intentar capturar otro handshake.
