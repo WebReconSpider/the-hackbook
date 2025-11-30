@@ -853,3 +853,41 @@ aircrack-ng [NOMBRE_ARCHIVO].cap
 ```
 
 Si el handshake es válido, `aircrack-ng` lo reconocerá y estará listo para un ataque de diccionario. Si no es válido, se deberá intentar capturar otro handshake.
+
+## 28. Fuerza bruta con John para obtener la contraseña de la red
+
+### Funcionamiento y Uso para WPA/WPA2
+Para utilizar John the Ripper en el cracking de contraseñas WPA/WPA2-PSK, se necesita:
+
+1.  **Un handshake capturado**: El archivo `.cap` obtenido con `airodump-ng` (Video 27) que contenga un handshake WPA/WPA2 válido.
+2.  **Un diccionario**: Cuanto más grande y relevante sea el diccionario, mayores serán las posibilidades de éxito.
+
+El proceso implica:
+
+1.  **Convertir el archivo `.cap` a un formato compatible con JtR**: John the Ripper no puede procesar directamente los archivos `.cap`. Se necesita una herramienta como:
+	- `aircrack-ng -J`
+	- `wpapsk2john`
+
+    ```bash
+    aircrack-ng [NOMBRE_ARCHIVO].cap -J [NOMBRE_HASH]
+    # Esto creará un archivo [NOMBRE_HASH].hccap
+    ```
+
+    ```bash
+    wpapsk2john [NOMBRE_ARCHIVO].cap > [NOMBRE_HASH].hash
+    ```
+
+2. Si el documento está en formato .hccap
+```bash
+hccap2john [NOMBRE_HASH].hccap > miHash
+```
+
+3.  **Ejecutar John the Ripper con el hash y el diccionario**: Una vez que se tiene el hash en el formato correcto, se puede ejecutar JtR en modo de diccionario.
+    ```bash
+    john --wordlist=[RUTA_DICCIONARIO] [NOMBRE_HASH].hash
+    ```
+
+### Consideraciones y Limitaciones
+-   **Dependencia del diccionario**: El éxito de un ataque de diccionario depende completamente de la calidad y exhaustividad de la lista de palabras. Si la contraseña no está en el diccionario, JtR no la encontrará.
+-   **Rendimiento**: El cracking de WPA/WPA2 es computacionalmente intensivo. El rendimiento de JtR puede mejorarse utilizando CPUs potentes o, idealmente, GPUs (aunque para esto se suelen usar herramientas como Hashcat, que están optimizadas para GPU).
+-   **Salting (SSID como salt)**: WPA/WPA2 utiliza el SSID de la red como un "salt" en el proceso de derivación de la clave. Esto significa que las rainbow tables genéricas no son efectivas para WPA/WPA2, y las tablas deben ser generadas específicamente para cada SSID, lo que aumenta la complejidad y el tiempo de precomputación.
