@@ -891,3 +891,31 @@ hccap2john [NOMBRE_HASH].hccap > miHash
 -   **Dependencia del diccionario**: El éxito de un ataque de diccionario depende completamente de la calidad y exhaustividad de la lista de palabras. Si la contraseña no está en el diccionario, JtR no la encontrará.
 -   **Rendimiento**: El cracking de WPA/WPA2 es computacionalmente intensivo. El rendimiento de JtR puede mejorarse utilizando CPUs potentes o, idealmente, GPUs (aunque para esto se suelen usar herramientas como Hashcat, que están optimizadas para GPU).
 -   **Salting (SSID como salt)**: WPA/WPA2 utiliza el SSID de la red como un "salt" en el proceso de derivación de la clave. Esto significa que las rainbow tables genéricas no son efectivas para WPA/WPA2, y las tablas deben ser generadas específicamente para cada SSID, lo que aumenta la complejidad y el tiempo de precomputación.
+
+
+## 29. Fuerza bruta con Aircrack para obtener la contraseña de la red
+
+Para realizar un ataque de fuerza bruta (diccionario) con Aircrack-ng, se necesitan dos elementos clave:
+
+1.  **Un handshake WPA/WPA2 capturado**: Un archivo `.cap` que contenga el 4-way handshake de la red objetivo (obtenido en el Video 27).
+2.  **Una lista de palabras (diccionario)**: Un archivo de texto con posibles contraseñas. La efectividad del ataque depende directamente de la calidad y el tamaño de este diccionario.
+
+El comando básico para ejecutar Aircrack-ng es:
+
+```bash
+aircrack-ng -w [RUTA_DICCIONARIO] [ARCHIVO_HANDSHAKE].cap
+```
+donde:
+`ARCHIVO_HANDSHAKE].cap` es la captura de la red objetivo. No es únicamente el handshake. 
+
+**Proceso de Aircrack-ng:**
+
+1.  Aircrack-ng leerá el archivo `.cap` y buscará handshakes válidos.
+2.  Una vez que encuentra un handshake, tomará cada palabra del diccionario, la combinará con el SSID de la red (que actúa como salt) y realizará las operaciones criptográficas necesarias para derivar el PMK (Pairwise Master Key).
+3.  Comparará el PMK calculado con el PMK contenido en el handshake capturado.
+4.  Si hay una coincidencia, la palabra del diccionario es la contraseña correcta, y Aircrack-ng la mostrará.
+
+### Consideraciones y Optimización
+-   **Rendimiento**: El cracking de WPA/WPA2 es un proceso que consume muchos recursos de CPU. Para contraseñas largas o complejas, puede llevar mucho tiempo o ser inviable con solo CPU.
+-   **Diccionarios**: Es fundamental utilizar diccionarios grandes y específicos. Se pueden encontrar diccionarios preexistentes en línea (ej. `rockyou.txt`) o crear diccionarios personalizados basados en información sobre el objetivo (ej. nombres de empresas, fechas, etc.).
+-   **Aceleración por GPU**: Herramientas como Hashcat están mucho más optimizadas para aprovechar la potencia de las GPUs, lo que puede acelerar drásticamente el proceso de cracking.
