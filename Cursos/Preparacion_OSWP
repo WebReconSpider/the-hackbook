@@ -919,3 +919,35 @@ donde:
 -   **Rendimiento**: El cracking de WPA/WPA2 es un proceso que consume muchos recursos de CPU. Para contraseñas largas o complejas, puede llevar mucho tiempo o ser inviable con solo CPU.
 -   **Diccionarios**: Es fundamental utilizar diccionarios grandes y específicos. Se pueden encontrar diccionarios preexistentes en línea (ej. `rockyou.txt`) o crear diccionarios personalizados basados en información sobre el objetivo (ej. nombres de empresas, fechas, etc.).
 -   **Aceleración por GPU**: Herramientas como Hashcat están mucho más optimizadas para aprovechar la potencia de las GPUs, lo que puede acelerar drásticamente el proceso de cracking.
+
+
+## 30. Proceso de ataque con Bettercap
+
+### Descripción de Bettercap
+Bettercap es una herramienta de código abierto, potente y versátil, diseñada para realizar ataques Man-in-the-Middle (MitM), reconocimiento de red, manipulación de tráfico y auditorías de seguridad en redes Wi-Fi, Bluetooth Low Energy (BLE) e IPv4/IPv6.
+
+### Funcionamiento y Uso para Ataques Wi-Fi
+Bettercap ofrece módulos para ataques Wi-Fi, incluyendo:
+
+1.  **Escaneo de redes (`wifi.recon on`)**: Permite descubrir redes Wi-Fi cercanas, sus SSIDs, BSSIDs, canales y clientes conectados. Puede operar en modo pasivo o activo.
+    ```bash
+    sudo bettercap -iface [INTERFACE_INALAMBRICA]
+    # Dentro de bettercap:
+    wifi.recon on
+    ```
+2.  **Captura de Handshakes y PMKIDs**: Bettercap puede capturar automáticamente handshakes WPA/WPA2-PSK y PMKIDs (Pairwise Master Key Identifiers). Los PMKIDs son especialmente útiles porque no requieren que un cliente esté conectado a la red para ser capturados, lo que acelera el proceso de obtención de hashes para el cracking offline.
+    ```bash
+    # Dentro de bettercap:
+    wifi.recon.channel [CANAL] # Opcional, para enfocar la captura
+    wifi.recon.target [MAC_AP] # Opcional, para enfocar la captura
+    wifi.recon on
+    # Los handshakes/PMKIDs capturados se guardan automáticamente en un archivo .pcap o .pcapng
+    ```
+3.  **Ataques de Desautenticación (`wifi.deauth`)**: Permite desconectar clientes de una red específica, lo que es útil para forzar la captura de handshakes o para realizar ataques de denegación de servicio.
+    ```bash
+    # Dentro de bettercap:
+    wifi.deauth [MAC_CLIENTE] # Desautentica un cliente específico
+    wifi.deauth [MAC_AP] # Desautentica a todos los clientes de un AP
+    ```
+4.  **Ataques de Rogue AP (Punto de Acceso Malicioso)**: Bettercap puede crear puntos de acceso falsos para engañar a los clientes y que se conecten a ellos, permitiendo la intercepción de tráfico y la captura de credenciales.
+5.  **Manipulación de tráfico**: Una vez que se ha establecido un ataque MitM, Bettercap puede inyectar código, modificar paquetes, realizar spoofing de DNS, etc.
