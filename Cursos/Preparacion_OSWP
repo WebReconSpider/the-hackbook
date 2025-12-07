@@ -1006,6 +1006,37 @@ pyrit -r [Captura_Handshake] -e [Nombre_AP] -i [Diccionario] attack_passthrough
    pyrit -r captura.cap -b 00:11:22:33:44:55 attack_db
    ```
 
+## 33. Cracking con Cowpatty
+
+Cowpatty es una herramienta especializada en ataques de diccionario contra redes WPA/WPA2-PSK, más simplificada y con la posibilidad de utilizar tablas hash precomputadas.
+
+### Fundamento técnico:
+- Implementa un ataque de diccionario offline contra handshakes WPA/WPA2 capturados
+- Puede utilizar tablas hash precomputadas (formato .genpmk) para acelerar el proceso
+- Menos complejo que Pyrit pero también menos potente en términos de rendimiento
+
+### Procedimiento detallado:
+1. Ataque básico de diccionario:
+   ```bash
+   cowpatty -f diccionario.txt -r captura.cap -s NombreDeRed
+   ```
+
+2. Ataque utilizando archivo hash precomputado:
+   ```bash
+   cowpatty -d archivo.genpmk -r captura.cap -s NombreDeRed
+   ```
+
+### Ventajas y desventajas:
+- **Ventajas**:
+  - Interfaz simple y fácil de usar
+  - Menor consumo de recursos que Pyrit
+  - Capacidad de utilizar tablas hash precomputadas
+  - Mejor integración con otras herramientas de la suite aircrack-ng
+
+- **Desventajas**:
+  - Menor velocidad de procesamiento que Pyrit
+  - Menos opciones de configuración y personalización
+  - No soporta aceleración por GPU
 
 
 
