@@ -1038,6 +1038,55 @@ Cowpatty es una herramienta especializada en ataques de diccionario contra redes
   - Menos opciones de configuración y personalización
   - No soporta aceleración por GPU
 
+## 34. Cracking con Airolib
+
+Airolib-ng es una herramienta especializada en la creación y gestión de bases de datos SQLite para almacenar ESSIDs, contraseñas y PMKs precomputadas, optimizando los ataques a redes WPA/WPA2.
+
+### Fundamento técnico:
+- Permite crear y gestionar bases de datos SQLite con PMKs precomputadas
+- Integrada con aircrack-ng para acelerar los ataques de diccionario
+- Optimiza el almacenamiento y la búsqueda de PMKs en comparación con archivos .genpmk
+
+### Procedimiento detallado:
+1.  Importar un diccionario de contraseñas y crear la base de datos:
+   ```bash
+   airolib-ng [base_datos] --import passwd [diccionario]
+   ```
+
+2. Importar el ESSID del AP:
+   ```bash
+   echo "[ESSID]" > [nombre_archivo].lst
+   airolib-ng [base_datos] --import essid [nombre_archivo].lst
+   ```
+   O añadir un ESSID directamente:
+   ```bash
+   airolib-ng [base_datos] --add essid NombreDeRed
+   ```
+
+3. Pasos previos
+   ```bash
+   airolib-ng base_datos --stats # para ver la información
+   airolib-ng base_datos --clean all
+   ```
+
+4. Calcular las PMKs:
+   ```bash
+   airolib-ng base_datos --batch
+   ```
+
+5. Utilizar la base de datos con aircrack-ng:
+   ```bash
+   aircrack-ng -r base_datos captura.cap
+   ```
+
+### Ventajas sobre otros métodos:
+- Mayor eficiencia en el almacenamiento que los archivos .genpmk
+- Mejor integración con aircrack-ng
+- Capacidad de gestionar múltiples ESSIDs en una sola base de datos
+
+### Limitaciones:
+- No soporta aceleración por GPU de forma nativa
+- El tamaño de la base de datos puede crecer significativamente con diccionarios grandes
 
 
 
