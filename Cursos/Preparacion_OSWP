@@ -1089,6 +1089,36 @@ Airolib-ng es una herramienta especializada en la creación y gestión de bases 
 - El tamaño de la base de datos puede crecer significativamente con diccionarios grandes
 
 
+## 35. Creación de una Rainbow Table con GenPMK
+
+GenPMK es una herramienta especializada en la creación de tablas hash precomputadas (rainbow tables) para acelerar los ataques contra redes WPA/WPA2-PSK.
+
+### Fundamento técnico:
+- Precomputa las PMKs para un SSID específico y un conjunto de contraseñas
+- Genera archivos en formato .genpmk que pueden ser utilizados por cowpatty
+
+### Funcionamiento:
+1. Crear una rainbow table básica:
+   ```bash
+   genpmk -f [diccionario.txt] -s [NombreDeRed] -d [tabla.genpmk]
+   ```
+- Genera el .genpmk si no existe
+
+1. Crear una tabla para múltiples SSIDs:
+   ```bash
+   genpmk -f diccionario.txt -d lista_ssids.txt -o tabla_multiple.genpmk
+   ```
+
+### Ventajas de las rainbow tables:
+- Reducen drásticamente el tiempo de ataque una vez creadas
+- Permiten reutilizar el trabajo computacional para futuros ataques
+- Especialmente efectivas para SSIDs comunes o predecibles
+
+### Consideraciones de espacio y tiempo:
+- La creación de la tabla puede llevar horas o días dependiendo del tamaño del diccionario
+- El tamaño de la tabla crece linealmente con el número de contraseñas
+- Una tabla para un diccionario de 1 millón de palabras puede ocupar varios GB
+
 
 ## 37. Cracking con Pyrit frente a una Rainbow Table
 
