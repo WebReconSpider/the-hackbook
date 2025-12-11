@@ -1119,6 +1119,11 @@ GenPMK es una herramienta especializada en la creación de tablas hash precomput
 - El tamaño de la tabla crece linealmente con el número de contraseñas
 - Una tabla para un diccionario de 1 millón de palabras puede ocupar varios GB
 
+### Limitaciones:
+- Las tablas son específicas para cada SSID, lo que limita su reutilización
+- Requiere gran cantidad de espacio de almacenamiento para diccionarios grandes
+- El proceso de creación es computacionalmente intensivo
+
 
 ## 37. Cracking con Pyrit frente a una Rainbow Table
 
