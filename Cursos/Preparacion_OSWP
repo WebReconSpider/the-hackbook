@@ -1125,6 +1125,36 @@ GenPMK es una herramienta especializada en la creación de tablas hash precomput
 - El proceso de creación es computacionalmente intensivo
 
 
+## 36. Cracking con Cowpatty frente a una Rainbow Table
+
+Este video muestra cómo utilizar cowpatty en conjunto con rainbow tables para acelerar significativamente los ataques contra redes WPA/WPA2-PSK.
+
+### Fundamento técnico:
+- Utiliza archivos .genpmk generados previamente con genpmk (video 35)
+- Evita tener que recalcular las PMKs durante el ataque
+- Reduce el tiempo de ataque de horas a segundos o minutos
+
+### Procedimiento:
+	 Ejecutar cowpatty con la rainbow table:
+   ```bash
+   cowpatty -d [tabla.genpmk] -r [captura_Handshake].cap -s [NombreDeRed]
+   ```
+### Análisis de rendimiento:
+- **Ataque tradicional**: Procesa ~50-200 contraseñas por segundo en CPU
+- **Con rainbow table**: Procesa ~50,000-500,000 contraseñas por segundo
+
+### Ventajas y consideraciones:
+- Dramática reducción del tiempo de ataque
+- Ideal para auditorías de seguridad con limitaciones de tiempo
+- Permite probar diccionarios mucho más grandes en tiempo razonable
+- El archivo .genpmk puede ser reutilizado para múltiples capturas del mismo SSID
+- 
+### Limitaciones:
+- Requiere tener la rainbow table específica para el SSID objetivo
+- El tamaño de las rainbow tables puede ser un factor limitante
+- No es efectivo si la contraseña no está en el diccionario original
+
+
 ## 37. Cracking con Pyrit frente a una Rainbow Table
 
 Este video demuestra cómo utilizar Pyrit con bases de datos precomputadas (similar a rainbow tables) para realizar ataques extremadamente rápidos contra redes WPA/WPA2-PSK.
