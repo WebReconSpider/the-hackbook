@@ -1177,3 +1177,27 @@ pyrit -e [NombreDeRed] -i [diccionario].txt -r [captura].cap attack_cowpatty
 - Posibilidad de utilizar la GPU para el ataque si no se encuentra la PMK en la base de datos
 - Capacidad de combinar múltiples bases de datos
 - Opción de exportar/importar bases de datos para compartir entre equipos
+
+
+## 37. Cracking con Pyrit frente a una Rainbow Table
+
+Este video demuestra cómo utilizar Pyrit con bases de datos precomputadas (similar a rainbow tables) para realizar ataques extremadamente rápidos contra redes WPA/WPA2-PSK.
+
+### Fundamento técnico:
+- Pyrit almacena PMKs precomputadas en su base de datos interna
+- Permite consultas extremadamente rápidas durante el ataque
+- Combina la velocidad de las rainbow tables con la flexibilidad de una base de datos
+
+### Procedimiento:
+
+```bash
+pyrit -e [NombreDeRed] -i [diccionario].txt -r [captura].cap attack_cowpatty
+``` 
+### Análisis de rendimiento:
+- **Ataque tradicional**: Limitado por la velocidad de cálculo de PMKs (~500-5,000 PMKs/s con CPU)
+- **Con base de datos**: Limitado solo por la velocidad de lectura de la base de datos (~50,000-1,000,000 PMKs/s)
+
+### Consideraciones avanzadas:
+- Posibilidad de utilizar la GPU para el ataque si no se encuentra la PMK en la base de datos
+- Capacidad de combinar múltiples bases de datos
+- Opción de exportar/importar bases de datos para compartir entre equipos
