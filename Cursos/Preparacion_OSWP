@@ -1228,3 +1228,33 @@ pyrit batch
 ```
 pyrit -r [Captura_Con_Handshake].cap attack_db
 ```
+
+## 39. Técnicas de espionaje
+
+Este video explora métodos avanzados para interceptar y analizar el tráfico en redes WPA/WPA2 una vez que se ha obtenido la contraseña, permitiendo espiar las comunicaciones de los usuarios.
+
+### Fundamento técnico:
+- Una vez conocida la PSK, es posible derivar las claves de sesión (PTK)
+- Estas claves permiten descifrar todo el tráfico entre clientes y el punto de acceso
+- El proceso es diferente para WPA (TKIP) y WPA2 (CCMP) debido a los diferentes algoritmos de cifrado
+
+### Diferencias entre WPA y WPA2 para espionaje:
+- **WPA con TKIP**:
+  - Utiliza RC4 para cifrado de datos
+  - Más vulnerable a ataques de inyección y manipulación
+  - Implementa un sistema de claves por paquete
+
+- **WPA2 con CCMP**:
+  - Utiliza AES para cifrado de datos
+  - Mayor seguridad contra ataques de inyección
+  - Implementa contador de paquetes para prevenir replay attacks
+
+### Técnicas de espionaje:
+- Filtrado de tráfico por protocolo (HTTP, FTP, SMTP, etc.)
+- Extracción de credenciales de servicios no cifrados
+- Reconstrucción de sesiones TCP para visualizar comunicaciones completas
+- Análisis de patrones de tráfico para identificar servicios y comportamientos
+
+### Contramedidas y limitaciones:
+- El tráfico HTTPS y otras comunicaciones cifradas siguen siendo seguras
+- Algunas aplicaciones implementan cifrado adicional independiente de la capa WiFi
