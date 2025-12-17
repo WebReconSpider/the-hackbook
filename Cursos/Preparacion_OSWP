@@ -1258,3 +1258,29 @@ Este video explora métodos avanzados para interceptar y analizar el tráfico en
 ### Contramedidas y limitaciones:
 - El tráfico HTTPS y otras comunicaciones cifradas siguen siendo seguras
 - Algunas aplicaciones implementan cifrado adicional independiente de la capa WiFi
+
+
+## 40. Uso de Airdecap para el desencriptado de paquetes
+
+Este video explica cómo utilizar airdecap-ng para descifrar capturas de tráfico WPA/WPA2, permitiendo el análisis posterior del contenido de las comunicaciones.
+
+### Fundamento técnico:
+- Airdecap-ng es una herramienta especializada en descifrar capturas de tráfico WiFi
+- Permite eliminar las cabeceras 802.11 y descifrar el contenido cifrado
+- Requiere conocer la contraseña o la PMK de la red
+
+### Procedimiento detallado:
+Si del handshake conseguimos la contraseña, con el ESSID de la red,  se puede descifrar el contenido del tráfico interno entre estaciones.
+Descifrar una captura WPA/WPA2 utilizando la contraseña:
+```bash
+   airdecap-ng -p [contraseña] -e [ESSID] [captura].cap
+```
+- genera un archivo `[Nombre-dec].cap` del que se puede ver los lugares visitados:
+	```bash
+   tshark -r [Nombre-dec].cap -Y "dns" 2>/dev/null
+	```
+
+- para ver los POST realizados por los usuarios con HTTP (pueden encontrarse claves de sesión):
+```bash
+tshark -r [Nombre-dec].cap -Y "http-request.method==POST" 2>/dev/null
+```
