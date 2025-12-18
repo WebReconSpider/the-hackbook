@@ -1284,3 +1284,14 @@ Descifrar una captura WPA/WPA2 utilizando la contraseña:
 ```bash
 tshark -r [Nombre-dec].cap -Y "http-request.method==POST" 2>/dev/null
 ```
+
+## 41. Ataques graciosos
+
+Este video explora técnicas de ataques no convencionales que, aunque pueden parecer humorísticos, demuestran vulnerabilidades importantes en redes inalámbricas.
+
+### Fundamento técnico:
+- Utiliza técnicas de denegación de servicio (DoS) y manipulación de paquetes para crear efectos disruptivos pero visibles
+- Aprovecha vulnerabilidades en la gestión de paquetes de redes WPA/WPA2
+- Demuestra cómo pequeñas modificaciones en los ataques pueden tener efectos notables en la experiencia del usuario
+
+### Técnicas presentadas:
