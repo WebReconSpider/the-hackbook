@@ -1323,3 +1323,45 @@ Donde hosts.txt contiene redirecciones humorísticas como:
 - **WPA2**: Vulnerable a la mayoría de estos ataques, aunque algunas implementaciones más recientes pueden detectar patrones de desautenticación sospechosos
 - **WPA2-Enterprise**: Menos vulnerable a algunos de estos ataques debido a la autenticación basada en 802.1X, pero sigue siendo susceptible a ataques de desautenticación
 
+## 42. Reemplazado de imágenes web con Xerosploit
+
+Este video demuestra cómo utilizar Xerosploit, una herramienta de ataque Man-in-the-Middle para interceptar y modificar el tráfico web, específicamente reemplazando imágenes en tiempo real.
+
+### Procedimiento detallado:
+
+#### 1. Instalación de Xerosploit
+```bash
+git clone https://github.com/LionSec/xerosploit
+cd xerosploit
+python install.py
+```
+
+#### 2. Ejecución y escaneo de la red
+```bash
+xerosploit
+scan
+```
+
+#### 3. Selección de la víctima y activación del módulo de reemplazo de imágenes
+```bash
+[IP_VICTIMA]
+replace
+run
+[Ruta_Imagen]
+```
+
+### Funcionamiento interno:
+- El ataque comienza con un envenenamiento ARP que redirige el tráfico de la víctima a través del atacante
+- Xerosploit utiliza un proxy transparente para interceptar las conexiones HTTP
+- El módulo imgre analiza el tráfico en busca de solicitudes de imágenes (GET de archivos .jpg, .png, etc.)
+- Cuando detecta una solicitud de imagen, sustituye la respuesta con una imagen predefinida por el atacante
+- Todo esto ocurre en tiempo real, sin que la víctima note cambios en la velocidad de navegación
+
+### Aplicabilidad por versiones de WPA/WPA2:
+- Funciona igualmente en redes protegidas con WPA o WPA2, siempre que el atacante haya conseguido conectarse a la red
+
+### Limitaciones:
+- Solo funciona con tráfico HTTP no cifrado; las imágenes cargadas a través de HTTPS están protegidas
+- Requiere que el atacante ya tenga acceso a la red objetivo
+- Algunos navegadores modernos muestran advertencias cuando se mezcla contenido HTTP y HTTPS
+- Sitios web que implementan Content Security Policy (CSP) pueden bloquear este tipo de manipulaciones
