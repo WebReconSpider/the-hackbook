@@ -1365,3 +1365,38 @@ run
 - Requiere que el atacante ya tenga acceso a la red objetivo
 - Algunos navegadores modernos muestran advertencias cuando se mezcla contenido HTTP y HTTPS
 - Sitios web que implementan Content Security Policy (CSP) pueden bloquear este tipo de manipulaciones
+
+
+## 43. Ataque de tipo Evil Twin
+
+Este video explica el ataque Evil Twin, una técnica que crea un punto de acceso falso que imita a uno legítimo para capturar credenciales y tráfico de red.
+
+### Fundamento técnico:
+- Un ataque Evil Twin crea un punto de acceso inalámbrico que duplica la identidad (SSID) de una red legítima
+- Aprovecha la tendencia de los dispositivos a conectarse automáticamente a redes conocidas
+- Combina técnicas de desautenticación para forzar a los clientes a reconectarse
+- Implementa un portal cautivo para solicitar credenciales o interceptar tráfico
+
+### Arquitectura del ataque:
+1. **Reconocimiento**: Identificación de redes objetivo y clientes conectados
+2. **Preparación**: Configuración del punto de acceso falso con el mismo SSID
+3. **Desautenticación**: Envío de paquetes de desautenticación para desconectar clientes
+4. **Suplantación**: Captura de conexiones de clientes en el punto de acceso falso
+5. **Interceptación**: Captura de credenciales o tráfico mediante portal cautivo o proxy transparente
+
+### Aplicabilidad por versiones:
+- **WPA**: Completamente vulnerable a este tipo de ataque
+- **WPA2-Personal (PSK)**: Igualmente vulnerable, ya que el ataque no intenta romper el cifrado sino engañar al usuario
+- **WPA2-Enterprise**: Menos vulnerable si se implementa correctamente con certificados de servidor validados, pero sigue siendo susceptible si los usuarios no verifican los certificados
+- **WPA3**: Introduce protecciones adicionales como Simultaneous Authentication of Equals (SAE), pero sigue siendo vulnerable si los usuarios aceptan conexiones no seguras
+
+### Ventajas para el atacante:
+- No requiere romper el cifrado WPA/WPA2
+- Altamente efectivo en entornos públicos donde los usuarios buscan conectividad
+- Permite capturar credenciales de múltiples servicios a través de portales cautivos
+- Posibilita ataques más sofisticados como inyección de malware o phishing
+
+### Consideraciones técnicas avanzadas:
+- La efectividad aumenta cuando se combina con técnicas de jamming para bloquear la señal original
+- Los dispositivos modernos pueden implementar detección de desautenticación masiva, por lo que se recomiendan ataques más selectivos
+- La creación de un punto de acceso con exactamente la misma huella digital (fingerprint) que el original aumenta la credibilidad del ataque
