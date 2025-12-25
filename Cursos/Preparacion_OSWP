@@ -1400,3 +1400,55 @@ Este video explica el ataque Evil Twin, una técnica que crea un punto de acceso
 - La efectividad aumenta cuando se combina con técnicas de jamming para bloquear la señal original
 - Los dispositivos modernos pueden implementar detección de desautenticación masiva, por lo que se recomiendan ataques más selectivos
 - La creación de un punto de acceso con exactamente la misma huella digital (fingerprint) que el original aumenta la credibilidad del ataque
+
+
+## 44. EvilTwin - Configurando nuestro archivo de configuración DHCPD
+
+Este video se centra en la configuración del servidor DHCP necesario para que el ataque Evil Twin funcione correctamente, permitiendo asignar direcciones IP a las víctimas que se conecten al punto de acceso falso.
+
+### Fundamento técnico:
+- DHCPD (DHCP Daemon) es el servidor que asigna direcciones IP dinámicamente a los clientes
+- En un ataque Evil Twin, el atacante necesita proporcionar configuración de red válida a las víctimas
+- La configuración adecuada de DHCPD permite controlar el tráfico y redirigirlo según sea necesario
+### Procedimiento detallado:
+1. Crear o modificar el archivo de configuración:
+```bash
+nano /etc/dhcp/dhcpd.conf
+```
+
+2. Configurar los parámetros específicos:
+   - **default-lease-time**: Tiempo predeterminado de concesión de IP (en segundos)
+   - **max-lease-time**: Tiempo máximo de concesión
+   - **subnet**: Definición de la red que se utilizará
+   - **range**: Rango de direcciones IP que se asignarán a los clientes
+   - **option routers**: Puerta de enlace predeterminada (generalmente la IP del atacante)
+   - **option domain-name-servers**: Servidores DNS (pueden ser legítimos o controlados por el atacante)
+
+### Archivo de configuración DHCPD:
+```
+authoritative;
+default-lease-time 600;
+max-lease-time 7200;
+
+# Definición de la subred
+subnet 192.168.1.128 netmask 255.255.255.128 {
+    option subnet-mask 255.255.255.128;
+    option broadcast-address 192.168.1.255;
+    option routers 192.168.1.129;
+    option domain-name-servers 8.8.8.8;
+    range 192.168.1.130 192.168.1.140;
+}
+```
+>[!warning] 
+>Modificar para que sea la misma rubred que la legítima.
+### Consideraciones técnicas:
+- Es crucial que el servidor DHCP responda más rápido que cualquier otro servidor DHCP legítimo en la red
+- La configuración debe ser coherente con la topología de red que se está suplantando
+- Parámetros incorrectos pueden causar problemas de conectividad que alertarían a las víctimas
+- El servidor DHCP debe estar correctamente vinculado a la interfaz de red que actúa como punto de acceso
+
+### Mejores prácticas para un ataque efectivo:
+- Utilizar un rango de IP similar al de la red original para evitar sospechas
+- Configurar los mismos servidores DNS que la red original (si se conocen)
+- Establecer tiempos de concesión cortos para mantener control sobre los clientes
+- Incluir todas las opciones DHCP que los clientes puedan esperar (como servidores de tiempo)
