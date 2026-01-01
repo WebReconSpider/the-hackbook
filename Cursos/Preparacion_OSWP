@@ -1523,3 +1523,54 @@ grant all privileges on rogue_AP.* to 'fakeap'@'localhost';
 - Adaptar el contenido al contexto (por ejemplo, mencionar el nombre del hotel si se está atacando una red de hotel)
 - Implementar validación de formularios para simular comportamiento real
 - Incluir mensajes de error realistas para credenciales incorrectas
+
+
+## 47. EvilTwin - Montando el punto de acceso con Airbase
+
+Este video detalla cómo utilizar Airbase-ng para crear el punto de acceso falso que será la base del ataque Evil Twin, permitiendo a las víctimas conectarse a una red que parece legítima.
+
+### Fundamento técnico:
+- Airbase-ng es una herramienta especializada en la creación de puntos de acceso inalámbricos
+- Permite configurar parámetros avanzados como el SSID, canal, velocidad y tipo de cifrado
+- Facilita la implementación de funciones como el portal cautivo y la captura de tráfico
+
+### Procedimiento:
+
+#### 1. Preparación del entorno
+```bash
+# Verificar interfaces disponibles
+iwconfig
+
+# Detener procesos que puedan interferir
+airmon-ng check kill
+
+# Poner la interfaz en modo monitor
+airmon-ng start wlan0
+```
+
+#### 2. Configuración básica de Airbase-ng
+```bash
+# Crear un punto de acceso abierto (sin cifrado)
+airbase-ng -e [ESSID] -c [Canal] -P [tarjeta_Modo_Monitor]
+```
+
+### Técnicas avanzadas con Airbase-ng:
+
+#### Emulación de cifrado (Karma Attack)
+```bash
+# Responder a cualquier sondeo con el mismo SSID (ataque Karma)
+airbase-ng -e "NombreRedOriginal" -c 6 -P -C 30 -v wlan0mon
+```
+
+#### Ataque de camuflaje (clonar MAC del AP original)
+```bash
+# Clonar la dirección MAC del AP original
+airbase-ng -e "NombreRedOriginal" -c 6 -a 00:11:22:33:44:55 wlan0mon
+```
+
+### Consideraciones:
+- La potencia de señal del punto de acceso falso debe ser mayor que la del original para atraer conexiones
+- El canal seleccionado debe ser el mismo o cercano al del AP original para mayor credibilidad
+- La estabilidad del punto de acceso falso es crucial para mantener las conexiones de las víctimas
+- El hardware utilizado debe tener buena compatibilidad con el modo monitor y la inyección de paquetes
+
