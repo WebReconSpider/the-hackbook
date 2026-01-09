@@ -1845,3 +1845,62 @@ mysql -u root -p -e "SELECT * FROM evil_twin.credentials;"
 - Análisis de comportamiento de red para identificar patrones sospechosos
 - Educación de usuarios para verificar la autenticidad de las redes
 - Implementación de políticas de seguridad que requieran VPN para conexiones remotas
+
+
+## 50. Uso de mi herramienta evilTrust para robo de credenciales en redes sociales
+
+Este video presenta evilTrust, una herramienta desarrollada por S4vitar que automatiza todo el proceso de ataque Evil Twin, con enfoque específico en la captura de credenciales de redes sociales mediante plantillas personalizadas.
+
+### Fundamento técnico:
+- evilTrust es una herramienta todo-en-uno que simplifica el despliegue de ataques Evil Twin
+- Automatiza la configuración de interfaces, servicios y reglas de firewall
+- Incluye plantillas prediseñadas para diferentes redes sociales y servicios
+- Implementa capacidades avanzadas como la captura de códigos de autenticación de dos factores (2FA)
+
+### Características principales de evilTrust:
+- Despliegue automatizado de un punto de acceso falso (Rogue AP)
+- Selección de plantillas para diferentes servicios (Facebook, Twitter, Google, etc.)
+- Capacidad para utilizar plantillas personalizadas
+- Captura de credenciales y códigos 2FA
+- Interfaz gráfica opcional para facilitar su uso
+
+### Procedimiento de instalación y uso:
+```bash
+# Clonar el repositorio
+git clone https://github.com/s4vitar/evilTrust
+
+# Acceder al directorio
+cd evilTrust
+
+# Dar permisos de ejecución
+chmod +x evilTrust.sh
+
+# Ejecutar la herramienta
+./evilTrust.sh
+```
+
+### Flujo de trabajo de evilTrust:
+1. **Verificación de dependencias**: Comprueba que todas las herramientas necesarias estén instaladas
+2. **Selección de interfaz**: Muestra las interfaces disponibles y configura automáticamente el modo monitor
+3. **Configuración del AP**: Solicita nombre y canal para el punto de acceso falso
+4. **Selección de plantilla**: Permite elegir entre las plantillas prediseñadas o usar una personalizada
+5. **Despliegue del ataque**: Configura automáticamente todos los servicios necesarios
+6. **Captura de credenciales**: Muestra en tiempo real las credenciales capturadas
+7. **Captura de 2FA**: Si la víctima tiene autenticación de dos factores, captura también el código
+
+### Plantillas disponibles en evilTrust:
+- **facebook-login**: Portal de Facebook con plantilla de 2FA operativa
+- **twitter-login**: Plantilla de Twitter con 2FA operativa
+- **google-login**: Segundo factor de autenticación para Google
+- **yahoo-login**: Plantilla de Yahoo con 2FA
+- **starbucks-login**: Plantilla de Starbucks con 2FA
+- **optimumwifi**: Plantillas de optimumwifi
+- **all_in_one**: Portal cautivo centralizado que lista todas las redes sociales
+- **cliqq-payload**: Plantilla para payload APK malicioso y sesión meterpreter
+
+### Ventajas sobre métodos manuales:
+- **Simplicidad**: Reduce significativamente la complejidad técnica del ataque
+- **Velocidad**: Permite desplegar el ataque en cuestión de minutos
+- **Consistencia**: Minimiza errores humanos en la configuración
+- **Flexibilidad**: Adaptable a diferentes escenarios y objetivos
+- **Mantenimiento**: Restaura automáticamente la configuración original al finalizar
