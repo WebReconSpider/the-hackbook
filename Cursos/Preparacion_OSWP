@@ -1906,3 +1906,22 @@ chmod +x evilTrust.sh
 - **Consistencia**: Minimiza errores humanos en la configuración
 - **Flexibilidad**: Adaptable a diferentes escenarios y objetivos
 - **Mantenimiento**: Restaura automáticamente la configuración original al finalizar
+
+
+## 51. Ataque a redes sin clientes
+
+Este video presenta cómo obtener el handshake de una red WPA/WPA2 **sin necesidad de que haya clientes conectados a ella**. Especialmente útil para auditar redes que están activas pero temporalmente sin uso.
+
+### Fundamento técnico:
+- El ataque se basa en la captura del **PMKID (Pairwise Master Key Identifier)**.
+- El PMKID es parte del proceso de roaming rápido (estándar 802.11r) y, en algunos casos, es enviado por el punto de acceso a un cliente que intenta conectarse.
+- A diferencia del handshake de 4 vías, que requiere una interacción completa con un cliente, el PMKID se puede obtener con solo el primer paquete del handshake (el mensaje M1 del AP al cliente).
+- Este ataque no siempre funciona, ya que depende de que el router y el driver del cliente soporten esta funcionalidad y la tengan habilitada.
+
+### Ventajas y limitaciones:
+- **Ventajas**: La principal ventaja es que **no se necesita un cliente conectado**. Además, no es necesario realizar un ataque de desautenticación, lo que lo hace más sigiloso.
+- **Limitaciones**: No todos los routers son vulnerables. Los routers más modernos o los que no implementan 802.11r pueden no enviar el PMKID. La efectividad de este ataque ha disminuido con el tiempo a medida que los fabricantes han parcheado esta vulnerabilidad.
+
+### Aplicabilidad y versiones:
+- **WPA/WPA2**: Funciona en redes WPA y WPA2 que sean vulnerables. No es un fallo del protocolo en sí, sino de implementaciones específicas.
+- **WPA3**: No es aplicable. WPA3 tiene protecciones específicas contra este tipo de ataques.
