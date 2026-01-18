@@ -1971,3 +1971,22 @@ Este video muestra cómo utilizar Bettercap para realizar la captura de PMKID si
    wifi.handshakes
    ```
    - Muestra los handshakes capturados.
+
+
+## 53. Ataque vía hcxdumptool
+
+Este video explica como utilizar hcxdumptool, una herramienta especializada para la captura de handshakes y PMKID de redes WiFi.
+
+### Procedimiento del video:
+
+1. **Activar el modo monitor**:
+
+2. **Captura básica con hcxdumptool**:
+   ```bash
+   sudo hcxdumptool -i [interfazModoMonitor] -o [captura].pcapng --active_beacon --enable_status=1
+   ```
+   - `--active_beacon`: Envía beacons activos para provocar respuestas.
+
+### Ventajas:
+- **Ataques dirigidos**: Capacidad para centrarse en redes específicas.
+- **Compatibilidad con hashcat**: Genera archivos directamente utilizables por herramientas de cracking.
