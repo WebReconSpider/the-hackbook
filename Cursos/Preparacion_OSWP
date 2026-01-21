@@ -1990,3 +1990,34 @@ Este video explica como utilizar hcxdumptool, una herramienta especializada para
 ### Ventajas:
 - **Ataques dirigidos**: Capacidad para centrarse en redes específicas.
 - **Compatibilidad con hashcat**: Genera archivos directamente utilizables por herramientas de cracking.
+
+
+## 54. Uso de hcxpcaptool y obtención de la contraseña
+
+Este video explica cómo procesar las capturas obtenidas con hcxdumptool utilizando hcxpcaptool para extraer los hashes y prepararlos para el cracking con hashcat.
+
+- **hcxpcaptool** permite extraer diferentes tipos de hashes: PMKID, EAPOL, etc.
+
+### Procedimiento del video:
+
+1. **Procesamiento básico de la captura**:
+   ```bash
+   hcxpcaptool -z [pmkids].16800 -E [essidlist].txt [captura].pcapng
+   ```
+   - `-z`: Extrae los hashes PMKID en formato hashcat 16800 y los exporta en ese documento.
+   - `-E`: Guarda la lista de ESSIDs detectados.
+
+2. **Análisis de la captura**:
+   ```bash
+   hcxpcaptool -A [info].txt [captura].pcapng
+   ```
+   - `-A`: Genera un análisis detallado de la captura.
+
+3. **Cracking con hashcat**:
+   ```bash
+   hashcat -m 16800 [pmkids].16800 -a 0 [wordlist].txt
+   ```
+ - `-m 16800`: Modo para PMKID.
+   - `-m 22000`: Modo para EAPOL (handshake).
+   - `-a 0`: Ataque de diccionario.
+
