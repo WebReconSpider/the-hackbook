@@ -2021,3 +2021,33 @@ Este video explica cómo procesar las capturas obtenidas con hcxdumptool utiliza
    - `-m 22000`: Modo para EAPOL (handshake).
    - `-a 0`: Ataque de diccionario.
 
+## 55. Ataques a redes ocultas
+
+Este video desmitifica la seguridad de las redes Wi-Fi con SSID oculto y demuestra cómo descubrir y atacar estas redes.
+
+### Fundamento técnico:
+- **¿Qué es una red oculta?**: Es una red que no emite su nombre (SSID) en los paquetes de baliza (beacon frames). Esto evita que aparezca en la lista de redes Wi-Fi disponibles de los dispositivos.
+- **Falsa seguridad**: Ocultar el SSID **no es una medida de seguridad efectiva**. El SSID se sigue transmitiendo en otros tipos de paquetes, como las solicitudes y respuestas de sondeo (probe requests/responses) cuando un cliente legítimo intenta conectarse.
+
+### Procedimiento del video:
+
+1.  **Descubrimiento de la red oculta**: Se utiliza `airodump-ng` para escanear el espectro. Las redes ocultas aparecen con un SSID tipo `<length: 0>` o similar, pero sí muestran su BSSID (dirección MAC).
+    ```bash
+    airodump-ng <interfaz_monitor>
+    ```
+
+2.  **Forzar la revelación del SSID**: Para descubrir el nombre, se puede esperar a que un cliente legítimo se conecte. Cuando lo haga, el SSID se transmitirá en texto plano. Para acelerar el proceso, se puede realizar un ataque de desautenticación contra un cliente que ya esté conectado a la red oculta.
+    ```bash
+    # Primero, identificar un cliente conectado a la red oculta
+    airodump-ng --bssid <BSSID_red_oculta> -c <canal> <interfaz_monitor>
+    
+    # Luego, desautenticar a ese cliente para forzar una reconexión
+    aireplay-ng -0 1 -a <BSSID_red_oculta> -c <MAC_cliente> <interfaz_monitor>
+    ```
+
+3.  **Ataque**: Una vez que se ha descubierto el SSID, el ataque procede exactamente igual que con una red normal. Se puede capturar el handshake de 4 vías y proceder a crackear la contraseña.
+
+### Conclusiones:
+- Ocultar el SSID ofrece una privacidad mínima frente a observadores casuales, pero ninguna seguridad real contra un atacante determinado.
+- Puede ser contraproducente, ya que algunos dispositivos pueden tener problemas de conexión o consumir más batería al buscar activamente redes ocultas.
+- No debe considerarse como una medida de seguridad, sino como una simple técnica de oscurecimiento.
