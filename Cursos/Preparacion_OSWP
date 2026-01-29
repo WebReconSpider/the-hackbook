@@ -2092,3 +2092,33 @@ Este video explora un caso específico y especializado: la vulneración de redes
 - **Configuración remota**: Algunos modelos permiten configuración remota, lo que puede ser explotado.
 - **Tráfico sensible**: El tráfico puede contener información de transacciones, aunque generalmente está cifrado a nivel de aplicación.
 - En un contexto real, estos sistemas suelen estar protegidos por múltiples capas de seguridad más allá de la red WiFi.
+
+
+## 57. Uso del Reloj DeAuther - DSTIKE
+
+Este video presenta un dispositivo: el reloj DSTIKE WiFi Deauther, una herramienta portable para realizar ataques de denegación de servicio a redes WiFi. No requiere modo monitor ni drivers especiales, ya que implementa los ataques a nivel de paquete en el propio hardware.
+
+### Procedimiento del video:
+
+1. **Configuración inicial del dispositivo**:
+   - Encender el dispositivo y conectarse a su red WiFi.
+
+2. **Escaneo de redes**:
+   - Desde la interfaz, seleccionar "Scan" para detectar redes cercanas.
+   - Seleccionar las redes objetivo marcándolas en la lista.
+
+3. **Tipos de ataques mostrados**:
+   - **Deauth Attack**: Envía paquetes de desautenticación a todos los clientes de las redes seleccionadas.
+     ```
+     [Interfaz Web] → Attacks → Deauth → Start
+     ```
+   
+   - **Beacon Spam**: Crea múltiples redes falsas para saturar el espectro.
+     ```
+     [Interfaz Web] → Attacks → Beacon → Start
+     ```
+   
+   - **Probe Attack**: Envía solicitudes de sondeo para confundir a los puntos de acceso.
+     ```
+     [Interfaz Web] → Attacks → Probe → Start
+     ```
