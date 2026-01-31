@@ -2122,3 +2122,50 @@ Este video presenta un dispositivo: el reloj DSTIKE WiFi Deauther, una herramien
      ```
      [Interfaz Web] → Attacks → Probe → Start
      ```
+
+## 58. Ataques por WPS
+
+Este video aborda una de las vulnerabilidades más graves y extendidas en routers domésticos: el **WPS (Wi-Fi Protected Setup)**.
+
+### Breve explicación:
+- **WPS** es un estándar diseñado para facilitar la conexión de dispositivos a una red Wi-Fi sin necesidad de introducir la contraseña. Generalmente, implica presionar un botón en el router o introducir un PIN de 8 dígitos.
+- **La vulnerabilidad del PIN**: El fallo de diseño reside en cómo se valida el PIN de 8 dígitos. El router lo valida en dos mitades de 4 dígitos cada una. Además, el último dígito es un checksum. Esto reduce drásticamente el número de combinaciones posibles a crackear:
+    - Primera mitad: 10^4 = 10,000 combinaciones.
+    - Segunda mitad: 10^3 = 1,000 combinaciones.
+    - Total: 11,000 combinaciones en lugar de 10^8 (100 millones).
+- Esto hace que un ataque de fuerza bruta para adivinar el PIN sea factible en cuestión de horas.
+
+### Procedimiento del video:
+
+1.  **Identificar redes con WPS activado**: Se utiliza `wash`, una herramienta que viene con `reaver`.
+    ```bash
+    wash -i <interfaz_monitor>
+    ```
+    - `wash` mostrará las redes cercanas que tienen WPS habilitado.
+> [!note] Resultado en un objetivo con  WPS desabilitado
+>-----------------------------------------------------------------------
+> BSSID               Ch  dBm  WPS  Lck  Vendor    ESSID  
+>---------------------------------------------------------------------
+>                                             No  
+
+1.  **Lanzar el ataque con `reaver`**:
+    ```bash
+    reaver -i <interfaz_monitor> -b <BSSID_objetivo> -vv -K 1
+    ```
+    - `-i`: Interfaz en modo monitor.
+    - `-b`: BSSID de la red objetivo.
+    - `-vv`: Modo muy verboso para ver el progreso.
+    - `-K 1` o `--pixie-dust`: Intenta el ataque Pixie Dust (ver mejoras).
+
+2.  **Ataque Pixie Dust**: Es mejor que el ataque de fuerza bruta original. Explota implementaciones débiles de WPS en algunos routers (como Ralink, Broadcom, Realtek) que no generan nonces de forma segura. Si el router es vulnerable, el PIN se puede obtener en segundos en lugar de horas.
+
+3.  **Uso de herramientas alternativas**:
+    ```bash
+    bully <interfaz_monitor> -b <BSSID_objetivo> -c <canal> -v 1
+    ```
+    - Bully es una alternativa a reaver que a veces funciona mejor contra ciertos routers.
+
+### Contramedidas:
+- **La contramedida más efectiva es deshabilitar WPS en la configuración del router.** Esta es la recomendación de seguridad universal.
+- Si no se puede deshabilitar, asegurarse de que el firmware del router esté actualizado, ya que algunos fabricantes han implementado protecciones contra estos ataques (aunque no siempre son efectivas).
+- Cambiar el PIN de WPS por defecto si el router lo permite (muy pocos lo hacen).
