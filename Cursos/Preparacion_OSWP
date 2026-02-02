@@ -2169,3 +2169,36 @@ Este video aborda una de las vulnerabilidades más graves y extendidas en router
 - **La contramedida más efectiva es deshabilitar WPS en la configuración del router.** Esta es la recomendación de seguridad universal.
 - Si no se puede deshabilitar, asegurarse de que el firmware del router esté actualizado, ya que algunos fabricantes han implementado protecciones contra estos ataques (aunque no siempre son efectivas).
 - Cambiar el PIN de WPS por defecto si el router lo permite (muy pocos lo hacen).
+
+
+## 59. Ataque Comunes (Redes WEP)
+
+### Descripción de WEP (Wired Equivalent Privacy)
+WEP fue el primer protocolo de seguridad implementado para redes inalámbricas 802.11, diseñado para proporcionar un nivel de seguridad comparable al de una red cableada. Sin embargo, WEP ha demostrado ser extremadamente vulnerable y obsoleto. Sus debilidades criptográficas permiten que un atacante con las herramientas adecuadas pueda crackear la clave WEP en cuestión de minutos, o incluso segundos, dependiendo del tráfico de la red.
+
+### Vulnerabilidades Clave de WEP
+Las principales vulnerabilidades de WEP se derivan de su diseño criptográfico, particularmente el uso del algoritmo RC4 y la forma en que maneja los Vectores de Inicialización:
+
+1.  **IVs Cortos y Reutilizados**: WEP utiliza un IV de 24 bits, que es demasiado corto. Esto significa que los IVs se repiten con frecuencia, especialmente en redes con mucho tráfico. Cuando se reutiliza un IV con la misma clave WEP, se crea una debilidad criptográfica que puede ser explotada.
+2.  **IVs Enviados en Claro**: Los IVs se transmiten en texto plano, lo que permite a un atacante recolectarlos fácilmente.
+3.  **Debilidades en el Algoritmo RC4**: El algoritmo de cifrado RC4, tal como se implementa en WEP, es susceptible a ataques si se utilizan IVs débiles o repetidos.
+
+### Ataques Comunes a Redes WEP
+Los ataques más comunes y efectivos contra redes WEP se basan en la recolección de un número suficiente de IVs para realizar un análisis estadístico y derivar la clave WEP. Las técnicas incluyen:
+
+1.  **Ataque de Recolección de IVs Pasiva**: Un atacante simplemente escucha el tráfico de la red y recolecta IVs. Cuantos más IVs se recolecten, más rápido se podrá crackear la clave. Este es un ataque pasivo y no genera tráfico adicional.
+
+2.  **Ataque de Inyección ARP (ARP Replay Attack)**: Este es el ataque más popular y efectivo contra WEP. Consiste en inyectar paquetes ARP (Address Resolution Protocol) en la red. Los paquetes ARP son pequeños y generan una gran cantidad de tráfico, lo que a su vez produce muchos IVs nuevos. Al reinyectar un paquete ARP capturado, se fuerza al AP a generar nuevas tramas con nuevos IVs, acelerando drásticamente la recolección de datos.
+    -   **Funcionamiento**: Se captura un paquete ARP de la red. Luego, se reinyecta este paquete repetidamente al AP. Cada vez que el AP reenvía el paquete, genera un nuevo IV. Esto permite recolectar miles de IVs por segundo.
+    -   **Herramienta**: `aireplay-ng`
+
+3.  **Ataque Chopchop**: Este ataque permite descifrar un paquete cifrado sin conocer la clave WEP. Se basa en la manipulación de paquetes y la observación de las respuestas del AP. Una vez que se descifra un paquete, se puede utilizar para generar nuevos IVs y acelerar el cracking.
+
+4.  **Ataque Fragmentation**: Similar al ataque Chopchop, permite obtener un bloque de texto plano de un paquete cifrado. Una vez obtenido, este bloque puede ser utilizado para inyectar paquetes y generar IVs.
+
+### Proceso General de Ataque WEP
+1.  **Poner la interfaz en modo monitor**: `airmon-ng start [INTERFACE]`
+2.  **Capturar tráfico y recolectar IVs**: `airodump-ng [INTERFACE_MONITOR]`
+3.  **Inyectar paquetes (si es necesario)**: Si el tráfico es bajo, usar `aireplay-ng` para inyectar paquetes ARP y acelerar la recolección de IVs.
+4.  **Crackear la clave**: Una vez que se han recolectado suficientes IVs (generalmente decenas de miles), `aircrack-ng` puede derivar la clave WEP.
+
