@@ -1,0 +1,76 @@
+# 🛡️ Resumen: Curso de Ciberseguridad y Privacidad 101 v2
+
+Fuente: [Hixec - Aprende CIBERSEGURIDAD Desde Cero](https://www.youtube.com/watch?v=gzES0MuWqHE)
+
+### Distinciones Clave
+
+| Concepto                    | Definición                                                                     |
+| --------------------------- | ------------------------------------------------------------------------------ |
+| Seguridad de la Información | Protección de datos en cualquier formato (físico o digital).                   |
+| Seguridad Informática       | Protección de la infraestructura física y digital que contiene la información. |
+| Ciberseguridad              | Protección de activos digitales y sistemas interconectados en el ciberespacio. |
+
+### La Tríada CIA + (NR + A)
+
+Fundamentos que todo pentester debe evaluar durante una auditoría:
+
+1.Confidencialidad: Solo personal autorizado accede a la información.
+
+2.Integridad: La información no ha sido alterada sin autorización.
+
+3.Disponibilidad: El sistema es accesible cuando se necesita.
+
+4.No Repudio (NR): Garantía de que un mensaje enviado o recibido no puede ser negado.
+
+5.Autenticidad (A): Verificación de la identidad del usuario o sistema.
+
+## Exploit, Payload, 0-Day
+
+Conceptos esenciales para entender el ciclo de un ataque:
+
+•Exploit: Fragmento de software, datos o secuencia de comandos que aprovecha una vulnerabilidad para causar un comportamiento no deseado.
+
+•Payload: La parte del exploit que ejecuta la acción dañina (ej. abrir una reverse shell).
+
+•0-Day (Zero Day): Vulnerabilidad desconocida para el fabricante y para la cual no existe parche. Es el "santo grial" para un atacante.
+
+## Malware y Amenazas
+
+•Virus: Requiere intervención humana para propagarse y se adjunta a archivos.
+
+•Gusano (Worm): Se propaga automáticamente a través de la red explotando vulnerabilidades.
+
+•Troyano: Se disfraza de software legítimo para engañar al usuario.
+
+•Ransomware: Cifra archivos y exige un rescate (foco actual en ataques corporativos).
+
+•Spyware/Adware: Enfocados en espionaje y publicidad intrusiva.
+
+## Gestión de Vulnerabilidades
+
+Un pentester se enfoca en la intersección de estos tres elementos:
+
+1.Amenaza (Threat): Evento potencial que puede causar daño (ej. un hacker, un desastre natural).
+
+2.Vulnerabilidad (Vulnerability): Debilidad en el sistema que puede ser explotada.
+
+3.Riesgo (Risk): La probabilidad de que una amenaza explote una vulnerabilidad multiplicada por el impacto.
+
+Nota: El trabajo del pentester es identificar las vulnerabilidades para reducir el riesgo antes de que una amenaza real las explote.
+
+## Herramientas Prácticas y Metodología
+
+El video menciona herramientas útiles para el día a día y para fases de reconocimiento:
+
+| Herramienta        | Uso en Pentesting / Seguridad                                            |
+| ------------------ | ------------------------------------------------------------------------ |
+| VirusTotal         | Análisis estático y dinámico de archivos y URLs sospechosas.             |
+| Have I Been Pwned  | Verificación de fugas de credenciales (OSINT).                           |
+| Mullvad Browser    | Navegación privada y segura, evitando el fingerprinting.                 |
+| Expanders (bit.ly) | Verificación del destino real de enlaces acortados para evitar phishing. |
+
+## Certificaciones
+
+•Certificaciones: Referencia al [Security Certification Roadmap de Paul Jerimy](https://pauljerimy.com/security-certification-roadmap/) para elegir certificaciones según el área (Red Team, Blue Team, etc.).
+
+•Laboratorios: Uso de plataformas como TryHackMe para práctica legal y controlada.
