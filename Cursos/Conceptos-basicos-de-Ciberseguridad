@@ -74,3 +74,70 @@ El video menciona herramientas útiles para el día a día y para fases de recon
 •Certificaciones: Referencia al [Security Certification Roadmap de Paul Jerimy](https://pauljerimy.com/security-certification-roadmap/) para elegir certificaciones según el área (Red Team, Blue Team, etc.).
 
 •Laboratorios: Uso de plataformas como TryHackMe para práctica legal y controlada.
+
+# 🛡️ Resumen: Curso de Ciberseguridad y Privacidad 202
+Fuente: [Hixec - CONTINÚA Aprendiendo CIBERSEGURIDAD desde CERO](https://www.youtube.com/watch?v=Bz1jX-dH3K8)
+
+## El Mito del "Candadito Verde" (HTTPS)
+
+Concepto crítico para ataques de Phishing y Man-in-the-Middle (MitM):
+
+•El candado indica que la conexión está cifrada (TLS/SSL), no que el sitio sea legítimo.
+
+•Un atacante puede obtener un certificado SSL gratuito (ej. Let's Encrypt) para un sitio de phishing.
+
+•Lección para Pentesting: Siempre verificar el dominio real, no solo el estado de cifrado.
+
+## Ingeniería Social y Phishing
+
+La ingeniería social es la manipulación psicológica para obtener información.
+
+### Tipos de Phishing
+
+| Tipo             | Descripción                                                                     |
+| ---------------- | ------------------------------------------------------------------------------- |
+| Phishing General | Campañas masivas sin un objetivo específico.                                    |
+| Spear Phishing   | Ataques dirigidos a una persona o empresa específica, altamente personalizados. |
+| Whaling          | Phishing dirigido a altos ejecutivos (C-level).                                 |
+| Vishing          | Realizado mediante llamadas telefónicas                                         |
+| Smishing         | Realizado mediante SMS                                                          |
+| QRishing         | Realizado mediante código QR                                                    |
+
+### Detección Manual
+
+1.Remitente: Verificar que el dominio del correo coincida exactamente con la empresa oficial.
+
+2.Gramática: Errores ortográficos o lenguaje inusual.
+
+3.Hyperlinks: Pasar el ratón sobre el enlace para ver la URL real en la barra de estado antes de hacer clic.
+
+4.Urgencia: Uso de amenazas o premios inmediatos para forzar una acción rápida.
+
+## Autenticación de Múltiples Factores (MFA)
+
+1.Algo que sabes: Contraseña, PIN, pregunta de seguridad.
+
+2.Algo que tienes: Token físico, correo, smartphone (TOTP), tarjeta inteligente.
+
+3.Algo que eres: Biometría (huella, iris, reconocimiento facial).
+
+Regla de Oro: Usar al menos dos factores de diferentes categorías para maximizar la seguridad.
+
+## Seguridad en Redes y Navegación
+
+Riesgos comunes en entornos de movilidad:
+
+•Wi-Fi Público: Riesgo de ataques Evil Twin y Sniffing. Nunca realizar transacciones sensibles en estas redes.
+
+•VPNs Gratuitas: "Si el producto es gratis, el producto eres tú". Muchas VPNs gratuitas venden datos de tráfico o inyectan publicidad/malware.
+
+•QR Codes: Peligro de Qrising (reemplazo de códigos QR legítimos por maliciosos).
+
+## 🛠️ Herramientas de Análisis de Amenazas
+
+| Herramienta            | Función                                                     |
+| ---------------------- | ----------------------------------------------------------- |
+| VirusTotal             | Análisis de archivos y URLs sospechosas.                    |
+| Talos Intelligence     | Reputación de IPs y dominios (Cisco).                       |
+| ExpandURL              | Revelar la URL final de un enlace acortado.                 |
+| Phishing Quiz (Google) | Entrenamiento interactivo para detectar correos maliciosos. |
