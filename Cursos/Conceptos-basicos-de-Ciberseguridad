@@ -141,3 +141,60 @@ Riesgos comunes en entornos de movilidad:
 | Talos Intelligence     | Reputación de IPs y dominios (Cisco).                       |
 | ExpandURL              | Revelar la URL final de un enlace acortado.                 |
 | Phishing Quiz (Google) | Entrenamiento interactivo para detectar correos maliciosos. |
+
+
+# 🛡️ Resumen: Curso de Ciberseguridad y Privacidad 303
+
+Fuente: [Hixec - Necesitas APRENDER PRIVACIDAD](https://www.youtube.com/watch?v=mgo1CRBaooo)
+
+## Deep Web vs. Dark Web
+
+### Niveles de la Web
+
+| Capa        | Descripción                                                                                 | Acceso                          |
+| ----------- | ------------------------------------------------------------------------------------------- | ------------------------------- |
+| Surface Web | Contenido indexado por buscadores (Google, Bing).                                           | Navegador estándar.             |
+| Deep Web    | Contenido no indexado (bases de datos, correos, intranets). No es necesariamente malicioso. | Autenticación o enlace directo. |
+| Dark Web    | Parte de la Deep Web que utiliza protocolos específicos y garantiza anonimato.              | Software especial (Tor, I2P).   |
+| Darknet     | Red superpuesta que requiere software, configuración o autorización específica.             | Tor, Freenet, etc.              |
+
+## El Ecosistema Tor (The Onion Router)
+
+Herramienta vital para el anonimato y para acceder a servicios .onion.
+
+- Funcionamiento: Cifrado por capas (como una cebolla) a través de nodos (Entrada, Intermedio, Salida).
+
+- Limitación: El nodo de salida puede ver el tráfico si este no va cifrado (HTTP vs HTTPS).
+
+- Diferencia entre Tor y una VPN:
+	La **VPN** cifra tu conexión a través de un único servidor central para darte privacidad y velocidad, ideal para uso diario.
+	**Tor** reenvía el tráfico por tres nodos voluntarios distintos para garantizar el anonimato total, siendo mucho más lento pero casi imposible de rastrear
+## Anonimato Avanzado: Sistemas Operativos
+
+Para un pentester, el sistema operativo desde el que opera puede comprometer su identidad.
+
+- Tails (The Amnesic Incognito Live System): OS que se ejecuta desde un USB. Todo el tráfico sale por Tor y no deja rastro en el disco duro al apagar.
+
+- Whonix: Sistema basado en dos máquinas virtuales (Gateway y Workstation). El tráfico de la Workstation pasa obligatoriamente por el Gateway (Tor), evitando fugas de IP incluso si la Workstation es comprometida.
+
+## Infraestructura de Privacidad
+
+### 1. Proxies vs. VPNs
+
+- Proxy: Intermediario para aplicaciones específicas. No suele cifrar todo el sistema.
+
+- VPN: Túnel cifrado para todo el tráfico del sistema. Ideal para ocultar la IP al ISP, pero requiere confianza en el proveedor de VPN (ej. ProtonVPN).
+
+### 2. Tipos de proxies 
+
+- Proxy cache: permite que el proxy almacene contenido que posiblemente se solicite a corto plazo, reduciendo el tiempo de respuesta
+
+- Proxy web: permite enviar información a través de este sin necesidad de instalarlo. Precaución ya que nada es gratis y pueden vender tus datos
+
+- Un proxy transparente actúa como un intermediario invisible que intercepta tu tráfico sin que tengas que configurar nada en tu dispositivo. Es útil para filtrar contenido en colegios o empresas, pero es arriesgado porque, al no notar su presencia, alguien podría estar monitoreando o modificando tu actividad sin tu consentimiento.
+
+- Proxy reverso: está situado delante del servidor y actúa como un "escudo" o recepcionista. No es visible para los clientes. Su función es proteger al servidor de ataques, reparte el trabajo entre varias máquinas y acelera la carga de la página.
+
+## Diferencia entre navegador y buscador
+- Navegador: software que permite la interpretación de hipertexto y lo muestra de una forma más amigable al usuario. Ejemplo: Google Chrome
+- Buscador: sistema cuyo objetivo es encontrar la información solicitada por el usuario. Ejemplo: Google
