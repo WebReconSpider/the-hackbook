@@ -17,84 +17,94 @@ La posibilidad de acceso FTP anónimo es una pista importante para el acceso ini
 
 ## 2. Enumeración Web
 
-Al visitar la página web (`http://<IP_DEL_OBJETIVO>`) y revisar su contenido o código fuente, encontramos una pista: "-- Utilizando el mismo usuario para todos mis servicios, podré recordarlo fácilmente --". 
+Al analizar el aplicativo web en el puerto 80, identificamos una frase crítica en el contenido:
 
-En la página aparece varias veces `russoski`  por lo que es un posible usuario.
+> "-- Utilizando el mismo usuario para todos mis servicios, podré recordarlo fácilmente --"
+
+Esta pista sugiere una vulnerabilidad de **reutilización de credenciales** (Password Reuse). Además, el nombre `russoski` aparece repetidamente, señalándolo como un usuario potencial del sistema.
+
 ## 3. Enumeración FTP Anónima
 
-### 2.1. Listado de Archivos FTP
+### 3.1. Inspección de Archivos
 
-Al conectarnos al FTP de forma anónima, observamos dos archivos:
+Aprovechamos la configuración insegura del servicio FTP para acceder sin credenciales (`anonymous`).
 
-*   `chat-gonza.txt`
-*   `pendientes.txt`
+```bash
+ftp <IP_DEL_OBJETIVO>
+# Name: anonymous
+# Password: (vacío)
+```
 
-Descargamos ambos archivos para analizarlos con el comando `get`.
+Encontramos y descargamos dos archivos de texto:
 
-### 2.2. Análisis de Archivos
+- `chat-gonza.txt`: Revela una conversación entre los usuarios `russoski`, `gonza` y `Nagore`.
+- `pendientes.txt`: Contiene una nota sobre seguridad: _"Cambiar algunas configuraciones de mi equipo, creo que tengo ciertos permisos habilitados que no son del todo seguros.."_.
 
-*   **`chat-gonza.txt`**: Contiene una conversación con tres posibles usuarios: russoski y gonza y Nagore
-*   **`pendientes.txt`**: `Cambiar algunas configuraciones de mi equipo, creo que tengo ciertos permisos habilitados que no son del todo seguros..`
-
+Esta información confirma la existencia del usuario `russoski` y sugiere una posible mala configuración de privilegios en el sistema.
 
 ## 4. Obtención de Credenciales y Acceso Inicial
 
-Con el nombre de usuario `russoski` y la pista de reutilización de contraseñas, intentamos un ataque de fuerza bruta contra el servicio FTP para obtener la contraseña.
+Basándonos en la pista de la web (reutilización de contraseñas) y el usuario confirmado `russoski`, procedemos a atacar el servicio FTP por ser generalmente más rápido y menos monitoreado que SSH para ataques de fuerza bruta.
 
-### 4.1. Fuerza Bruta con Hydra (FTP)
+### 4.1. Fuerza Bruta con Hydra
 
-Utilizamos `hydra` para intentar adivinar la contraseña del usuario `russoski` en el servicio FTP.
+Ejecutamos `hydra` contra el servicio FTP usando el diccionario `rockyou.txt`.
 
 ```bash
 hydra -l russoski -P /path/to/wordlist/rockyou.txt -u ftp://<IP_DEL_OBJETIVO>
 ```
 
-**Resultado Clave:**
+**Resultado:**
 
 *   `[21][ftp] host: <IP_DEL_OBJETIVO> login: russoski password: iloveme`
 
-Esto nos proporciona la contraseña para el usuario `russoski`: **iloveme**.
+La contraseña es **iloveme**.
 
-vemos varios archivos y una foto, los obtenemos con el comando `get` y los inspeccionamos. No hay información relevante. Utilizamos steghide y exiftool para vuscar información oculta dentro de la imagen, pero sin éxito.
-### 4.2. Conexión SSH con Credenciales Reutilizadas
+Hay varios archivos y una foto pero no contienen información relevante.
 
-Dado que el usuario `russoski` reutiliza contraseñas, intentamos usar las mismas credenciales (`russoski:iloveme`) para acceder al servicio SSH.
+### 4.2. Conexión SSH
+
+Siguiendo la pista de "el mismo usuario para todos mis servicios", utilizamos las credenciales obtenidas en el FTP para autenticarnos vía SSH.
 
 ```bash
 ssh russoski@<IP_DEL_OBJETIVO>
-# Contraseña: iloveme
+# Password: iloveme
 ```
 
-Hemos obtenido acceso inicial al sistema.
+El acceso es exitoso.
 
 ## 5. Escalada de Privilegios
 
 Una vez que hemos obtenido acceso SSH como el usuario `russoski`, el objetivo es escalar privilegios a `root`.
 
-### 5.1. Verificación de Permisos Sudo
+### 5.1. Enumeración de Sudoers
 
-Verificamos qué comandos puede ejecutar el usuario `russoski` con `sudo` sin necesidad de contraseña. Esto se hace con el comando :
-```bash
+Una vez dentro, buscamos vectores de escalada revisando los permisos de `sudo`.
+
+```Bash
 sudo -l
 ```
 
-**Resultados Clave:**
+**Salida:**
 
-*   `User russoski may run the following commands on ...: (root) NOPASSWD: /usr/bin/vim`
-
-Esto significa que el usuario `russoski` puede ejecutar el binario `/usr/bin/vim` como `root` sin necesidad de introducir su contraseña. 
-
-### 5.2. Abuso de Vim con Sudo para Obtener Shell de Root
-
-Consultamos [GTFOBins](https://gtfobins.github.io/gtfobins/vim/#sudo) para la técnica específica.
-
-Para obtener un shell de `root`, ejecutamos `vim` con un comando que nos permita ejecutar un shell directamente.
-
-```bash
-sudo -u root /usr/bin/vim -c ":!/bin/sh"
+```
+User russoski may run the following commands on ...:
+    (root) NOPASSWD: /usr/bin/vim
 ```
 
-El comando `whoami` confirmará que hemos escalado exitosamente a `root`.
+El usuario puede ejecutar el editor de texto `vim` con privilegios de `root` y sin contraseña.
+
+### 5.2. Explotación de Vim (GTFOBins)
+
+`vim` permite la ejecución de comandos del sistema. Al ejecutarlo con `sudo`, podemos invocar una shell que heredará los permisos de superusuario.
+
+```bash
+sudo /usr/bin/vim -c ':!/bin/sh'
+```
+
+Alternativamente, dentro de la interfaz de vim, podemos escribir `:!/bin/sh` y presionar Enter.
+
+Confirmamos el compromiso total del sistema:
 
 ```bash
 whoami
