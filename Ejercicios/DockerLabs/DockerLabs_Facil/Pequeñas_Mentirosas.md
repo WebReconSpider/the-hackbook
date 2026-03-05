@@ -62,7 +62,7 @@ ssh a@<IP_DEL_OBJETIVO>
 
 ## 4. Movimiento Lateral y Descubrimiento de Pistas
 
-Una vez dentro como el usuario `a`, necesitamos buscar más información para escalar privilegios o movernos lateralmente a otros usuarios.
+na vez dentro del sistema como el usuario `a`, iniciamos la fase de enumeración interna para buscar vectores de escalada o movimiento lateral.
 
 ### 4.1. Enumeración de Usuarios y Directorios Home
 
@@ -91,17 +91,21 @@ scp a@<IP_DEL_OBJETIVO>:/srv/ftp/* ~/Pequenas_mentirosas
 *   `retos.txt`: Contiene "Cifrado Simétrico: Usa AES para desencriptar el siguiente archivo.". Esto podría ser un reto adicional.
 *   `retos_asimetricos`: Contiene "Cifrado Asimétrico: Encuentra la clave privada para desencriptar.". Otro reto.
 
-### 4.3. Cracking de Hash para el Usuario Spencer
+### 4.3. ### Cracking del Hash (John the Ripper)
 
-La pista nos indica que debemos crackear un hash para `spencer`. Utilizando una herramienta como `john` o `hashcat` con el hash de `spencer` y un diccionario, obtenemos la contraseña.
+Utilizamos `john` junto con el diccionario `rockyou.txt` para descifrar el hash obtenido.
 
-**Resultado Clave:**
+```bash
+john --wordlist=/usr/share/wordlists/rockyou.txt hash_spencer.txt
+```
+
+**Resultado:**
 
 *   `hash_spencer.txt: password1`
 
 La contraseña para `spencer` es **password1**.
 
-### 4.4. Conexión SSH como Spencer
+### 4.4. Pivoting a Spencer
 
 Con las credenciales de `spencer`, nos conectamos al servidor SSH.
 
@@ -112,19 +116,21 @@ ssh spencer@<IP_DEL_OBJETIVO>
 
 ## 5. Escalada de Privilegios
 
-Una vez que hemos obtenido acceso SSH como el usuario `spencer`, el objetivo es escalar privilegios a `root`.
+El objetivo final es obtener control total del sistema comprometiendo la cuenta `root`.
 
-### 5.1. Verificación de Permisos Sudo
+### 5.1. Enumeración de Sudoers
 
-Verificamos qué comandos puede ejecutar el usuario `spencer` con `sudo` sin necesidad de contraseña. Esto se hace con el comando `sudo -l`.
+Verificamos los privilegios administrativos asignados al usuario `spencer`.
 
 ```bash
 sudo -l
 ```
 
-**Resultados Clave:**
+**Resultados:**
 
 *   `User spencer may run the following commands on ...: (ALL) NOPASSWD: /usr/bin/python3`
+
+El usuario `spencer` puede ejecutar el intérprete de Python 3 como superusuario sin necesidad de proporcionar contraseña.
 
 ### 5.2. Obtención de Shell de Root con Python
 
