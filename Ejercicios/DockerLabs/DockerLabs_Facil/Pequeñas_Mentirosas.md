@@ -15,37 +15,41 @@ nmap -sC -sV --open <IP_DEL_OBJETIVO>
 
 ## 2. Enumeración Web y Pista Inicial
 
-Al acceder a la dirección IP del objetivo en un navegador web, la página muestra una pista importante.
+Al acceder a la dirección IP del objetivo en el navegador web (`http://<IP_DEL_OBJETIVO>`), la página principal muestra una pista importante.
 
 ### 2.1. Pista en la Página Web
 
-La página web contiene el mensaje: "Pista: Encuentra la clave para A en los archivos.". Esto sugiere que hay un usuario llamado "A" y que su clave (probablemente una contraseña o clave SSH) está oculta en algún archivo del sistema.
+La página web contiene el mensaje: 
+`Pista: Encuentra la clave para A en los archivos.`
+Esto sugiere que hay un usuario llamado "a" y que su clave (probablemente una contraseña o clave SSH) está oculta.
 
-### 2.2. Búsqueda de Directorios (Gobuster)
+### 2.2. Fuzzing de Directorios (Gobuster)
 
-Aunque la pista es clara, siempre es buena práctica realizar una enumeración de directorios con herramientas como `gobuster` para descubrir posibles rutas ocultas o archivos interesantes en el servidor web.
+Para asegurar que no pasamos por alto rutas ocultas, realizamos una enumeración de directorios en el servidor web.
 
 ```bash
 gobuster dir http://<IP_DEL_OBJETIVO>/ -w /path/to/wordlist/directory-list-2.3-medium.txt -x html,php
 ```
 
-En este caso, la enumeración de directorios no revela nada directamente útil para la clave de "A", lo que nos redirige a la pista de los archivos.
+La enumeración no revela directorios o archivos sensibles adicionales, lo que nos redirige al análisis de la pista inicial orientada al servicio SSH.
 
 ## 3. Acceso Inicial (SSH)
 
-La pista "Encuentra la clave para A en los archivos" y el puerto SSH abierto nos llevan a intentar un acceso SSH. A menudo, en CTFs, los nombres de usuario simples como letras o nombres comunes son los primeros a probar.
+Con el posible usuario `a` identificado y el puerto SSH abierto, procedemos a realizar un ataque de fuerza bruta asumiendo que la clave podría ser una contraseña débil presente en diccionarios estándar.
 
 ### 3.1. Fuerza Bruta SSH para el Usuario "a"
 
-Intentamos un ataque de fuerza bruta contra el usuario `a` en el servicio SSH. Esto se hace para ver si una contraseña común o una de un diccionario puede funcionar.
+Ejecutamos `hydra` utilizando el diccionario `rockyou.txt`.
 
 ```bash
 hydra -l a -P /path/to/wordlist/rockyou.txt ssh://<IP_DEL_OBJETIVO>
 ```
 
-**Resultado :**
+**Resultado:**
 
 *   `[22][ssh] host: <IP_DEL_OBJETIVO> login: a password: secret`
+
+Hemos obtenido la contraseña para el usuario inicial: **secret**.
 
 ### 3.2. Conexión SSH como "a"
 
