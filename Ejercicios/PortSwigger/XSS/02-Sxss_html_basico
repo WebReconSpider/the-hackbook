@@ -1,0 +1,48 @@
+# Stored XSS into HTML context with nothing encoded
+
+> [!note]- Enunciado:
+>  Este laboratorio contiene una vulnerabilidad de secuencias de comandos entre sitios (XSS) almacenada en la funcionalidad de comentarios.Para resolver este ejercicio, envía un comentario que llame a la función `alert` cuando se visualice la entrada del blog.
+
+## 1. Reconocimiento
+
+Al acceder a la aplicación web, encontramos un blog corporativo que contiene múltiples publicaciones. Entramos a uno de los foros o entradas del blog y descubrimos una funcionalidad que permite a los usuarios escribir y enviar **comentarios**.
+
+![[Pasted image 20260417122357.png]]
+
+## 2. Análisis de Vulnerabilidades (Fuzzing Manual)
+
+### 2.1. Pruebas de Sanitización
+
+Introducimos una cadena de caracteres especiales en el cuerpo del mensaje para comprobar una posible vulnerabilidad.
+
+```
+< > ' " &
+```
+
+### 2.2. Source Code
+
+Al publicar el comentario y recargar la página, inspeccionamos el código fuente de la respuesta.
+
+Observamos que nuestra entrada se refleja directamente dentro de las etiquetas de párrafo HTML (`<p>`), **sin ningún tipo de codificación de entidades HTML**:
+
+```HTML
+<p>< > ' " &</p>
+```
+
+Esto nos confirma una vulnerabilidad crítica de **Cross-Site Scripting Almacenado (Stored XSS)**, ya que el servidor no sanitiza la entrada antes de guardarla y mostrarla.
+
+## 3. Explotación (XSS Almacenado)
+
+### 3.1. Inyección del Payload
+
+Volvemos al formulario de comentarios y redactamos una nueva entrada. Inyectamos directamente nuestro _payload_ en el campo del mensaje:
+
+```
+<script>alert('XSS Almacenado')</script>
+```
+
+El servidor almacena el comentario malicioso en la base de datos. Al recargar la vista de la publicación, el navegador recibe la respuesta, lee las etiquetas inyectadas como código y ejecuta la función `alert()`, mostrando una ventana emergente.
+
+A diferencia de un ataque reflejado, al ser persistente, este código se ejecutará automáticamente en el navegador de cualquier usuario o administrador que visite esta entrada del blog en el futuro.
+
+**Laboratorio resuelto con éxito**
