@@ -1,3 +1,9 @@
+# Reflected XSS into HTML context with nothing encoded
+
+> [!note]- Enunciado:
+> This lab contains a simple reflected cross-site scripting vulnerability in the search functionality.
+To solve the lab, perform a cross-site scripting attack that calls the `alert` function.
+
 ## 1. Reconocimiento
 
 Al acceder a la aplicación web, encontramos un blog que contiene múltiples publicaciones y una **barra de búsqueda** para filtrar contenido.
