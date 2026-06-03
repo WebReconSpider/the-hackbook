@@ -1,5 +1,6 @@
 # DOM XSS in `innerHTML` sink using source `location.search`
-> [!note]- Enunciado: Este laboratorio contiene una vulnerabilidad de secuencias de comandos entre sitios (XSS) basada en el DOM en la funcionalidad de búsqueda del blog. Utiliza una asignación `innerHTML` que cambia el contenido HTML de un elemento `div` (o `span`), utilizando datos extraídos de `location.search`. Para resolver este laboratorio, realice un ataque de secuencias de comandos entre sitios que llame a la función `alert`.
+> [!note]- Enunciado:
+> Este laboratorio contiene una vulnerabilidad de secuencias de comandos entre sitios (XSS) basada en el DOM en la funcionalidad de búsqueda del blog. Utiliza una asignación `innerHTML` que cambia el contenido HTML de un elemento `div` (o `span`), utilizando datos extraídos de `location.search`. Para resolver este laboratorio, realice un ataque de secuencias de comandos entre sitios que llame a la función `alert`.
 
 ## 1. Reconocimiento
 
@@ -41,4 +42,4 @@ Al hacer clic en "Search" (o procesar la URL), el JavaScript del cliente asigna 
 
 El navegador inserta la etiqueta `<img>` e intenta cargar la imagen desde una ruta inválida (`src=1`). Al fallar la carga, se dispara inmediatamente el evento `onerror`, el cual ejecuta nuestro código JavaScript (`alert(1)`), mostrando la ventana emergente en pantalla.
 
-**Laboratorio resuelto con éxito.**
+**Laboratorio resuelto**
