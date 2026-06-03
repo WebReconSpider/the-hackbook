@@ -1,0 +1,48 @@
+# DOM XSS in `innerHTML` sink using source `location.search`
+> [!note]- Enunciado: Este laboratorio contiene una vulnerabilidad de secuencias de comandos entre sitios (XSS) basada en el DOM en la funcionalidad de búsqueda del blog. Utiliza una asignación `innerHTML` que cambia el contenido HTML de un elemento `div` (o `span`), utilizando datos extraídos de `location.search`. Para resolver este laboratorio, realice un ataque de secuencias de comandos entre sitios que llame a la función `alert`.
+
+## 1. Reconocimiento
+
+Al acceder a la aplicación web, identificamos un blog con múltiples entradas y una **barra de búsqueda** habilitada para filtrar el contenido.
+
+![[Pasted image 20260417130546.png]]
+
+Al realizar una búsqueda de prueba (por ejemplo, `hola`), observamos que el valor introducido viaja a través de la URL en el parámetro `?search=hola`.
+
+## 2. Análisis de Vulnerabilidades (Source & Sink)
+
+Para comprobar el nivel de sanitización, introducimos una cadena de caracteres especiales (`test<>"'`) en la barra de búsqueda.
+
+### 2.1. Análisis del Código Cliente (DevTools)
+
+Al inspeccionar el comportamiento de la página utilizando las herramientas de desarrollador del navegador (F12), localizamos cómo se procesa nuestra entrada. Observamos el siguiente bloque en el DOM:
+
+HTML
+
+```
+<span id="searchMessage">test<>"'</span>
+```
+
+El análisis revela que la aplicación está capturando el parámetro de la URL (`location.search` como **Source**) y lo está insertando directamente dentro del elemento `searchMessage` utilizando la propiedad `innerHTML` (el **Sink**), sin aplicar ninguna codificación de entidades HTML. Esto confirma la vulnerabilidad de **DOM XSS**.
+
+## 3. Explotación (DOM XSS)
+
+### 3.1. Selección e Inyección del Payload
+
+Como nuestra entrada se procesa mediante la propiedad `innerHTML`, existe una restricción de seguridad en HTML5: los navegadores modernos **no ejecutan** las etiquetas `<script>` que se inyectan a través de `innerHTML`.
+
+Para evadir esta restricción, utilizamos un vector de ataque basado en manejadores de eventos (Event Handlers). Inyectamos el siguiente _payload_ en la caja de búsqueda (o directamente en la URL):
+
+Fragmento de código
+
+```
+<img src=1 onerror=alert(1)>
+```
+
+### 3.2. Ejecución en el Cliente
+
+Al hacer clic en "Search" (o procesar la URL), el JavaScript del cliente asigna nuestro _payload_ al `innerHTML` del elemento.
+
+El navegador inserta la etiqueta `<img>` e intenta cargar la imagen desde una ruta inválida (`src=1`). Al fallar la carga, se dispara inmediatamente el evento `onerror`, el cual ejecuta nuestro código JavaScript (`alert(1)`), mostrando la ventana emergente en pantalla.
+
+**Laboratorio resuelto con éxito.**
