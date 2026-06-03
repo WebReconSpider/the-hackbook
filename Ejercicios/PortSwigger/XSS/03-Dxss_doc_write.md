@@ -1,6 +1,7 @@
 # Lab: DOM XSS in `document.write` sink using source `location.search`
 
-> [!note]- Enunciado: Este laboratorio contiene una vulnerabilidad de secuencias de comandos entre sitios (XSS) basada en el DOM en la funcionalidad de seguimiento de consultas de búsqueda. Utiliza la función JavaScript `document.write`, que escribe datos en la página. La función `document.write` se llama con datos de `location.search`, que puedes controlar mediante la URL del sitio web. Para resolver este laboratorio, realice un ataque de secuencias de comandos entre sitios que llame a la función `alert`.
+> [!note]- Enunciado: 
+> Este laboratorio contiene una vulnerabilidad de secuencias de comandos entre sitios (XSS) basada en el DOM en la funcionalidad de seguimiento de consultas de búsqueda. Utiliza la función JavaScript `document.write`, que escribe datos en la página. La función `document.write` se llama con datos de `location.search`, que puedes controlar mediante la URL del sitio web. Para resolver este laboratorio, realice un ataque de secuencias de comandos entre sitios que llame a la función `alert`.
 
 ## 1. Reconocimiento
 
