@@ -3,7 +3,7 @@
 
 ## 1. Reconocimiento
 
-Al acceder a la aplicación web, identificamos un blog con múltiples entradas y una **barra de búsqueda** habilitada para filtrar el contenido.
+Al acceder a la aplicación web, identificamos un blog con múltiples entradas y una **barra de búsqueda** para filtrar el contenido.
 
 ![[Pasted image 20260417130546.png]]
 
@@ -17,9 +17,7 @@ Para comprobar el nivel de sanitización, introducimos una cadena de caracteres 
 
 Al inspeccionar el comportamiento de la página utilizando las herramientas de desarrollador del navegador (F12), localizamos cómo se procesa nuestra entrada. Observamos el siguiente bloque en el DOM:
 
-HTML
-
-```
+```HTML
 <span id="searchMessage">test<>"'</span>
 ```
 
@@ -32,8 +30,6 @@ El análisis revela que la aplicación está capturando el parámetro de la URL 
 Como nuestra entrada se procesa mediante la propiedad `innerHTML`, existe una restricción de seguridad en HTML5: los navegadores modernos **no ejecutan** las etiquetas `<script>` que se inyectan a través de `innerHTML`.
 
 Para evadir esta restricción, utilizamos un vector de ataque basado en manejadores de eventos (Event Handlers). Inyectamos el siguiente _payload_ en la caja de búsqueda (o directamente en la URL):
-
-Fragmento de código
 
 ```
 <img src=1 onerror=alert(1)>
