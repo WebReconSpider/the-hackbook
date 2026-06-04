@@ -1,3 +1,5 @@
+# DOM XSS in jQuery anchor href attribute sink using location.search source
+
 > [!note]- Enunciado: 
 > Este laboratorio contiene una vulnerabilidad de secuencias de comandos entre sitios (XSS) basada en el DOM en la página de envío de comentarios (_Submit feedback_). La aplicación utiliza la función selectora de jQuery `$()` para encontrar un elemento de anclaje (enlace) y cambia su atributo `href` utilizando datos extraídos de `location.search`. Para resolver el laboratorio, realice un ataque que llame a la función `print()` (o `alert()`) en el navegador de la víctima.
 
@@ -49,4 +51,4 @@ Al cargar la página modificada, el código jQuery del cliente procesa la URL y 
 
 Para detonar el _payload_, simulamos la interacción de la víctima haciendo clic en el enlace "Back". El navegador interpreta el pseudo-protocolo y ejecuta la función `print()`, abriendo el cuadro de diálogo de impresión del sistema.
 
-**Laboratorio resuelto con éxito.**
+**Laboratorio resuelto**

@@ -1,4 +1,5 @@
 # DOM XSS in `innerHTML` sink using source `location.search`
+
 > [!note]- Enunciado:
 > Este laboratorio contiene una vulnerabilidad de secuencias de comandos entre sitios (XSS) basada en el DOM en la funcionalidad de búsqueda del blog. Utiliza una asignación `innerHTML` que cambia el contenido HTML de un elemento `div` (o `span`), utilizando datos extraídos de `location.search`. Para resolver este laboratorio, realice un ataque de secuencias de comandos entre sitios que llame a la función `alert`.
 

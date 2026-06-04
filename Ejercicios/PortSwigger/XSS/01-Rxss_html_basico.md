@@ -50,4 +50,4 @@ https://<lab>.web-security-academy.net/?search=<script>alert('XSS Reflejado')</s
 
 El navegador recibe la respuesta, lee las etiquetas y ejecuta la función `alert()`, mostrando una ventana emergente.
 
-**Laboratorio resuelto con éxito.**
+**Laboratorio resuelto**

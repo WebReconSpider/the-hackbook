@@ -54,4 +54,4 @@ Al recargar la URL, el JavaScript del cliente ejecuta el `document.write` con nu
 
 El navegador procesa este nuevo DOM modificado, cierra la etiqueta de imagen original y ejecuta la etiqueta `<script>` inyectada, mostrando la ventana emergente.
 
-**Laboratorio resuelto con éxito.**
+**Laboratorio resuelto**

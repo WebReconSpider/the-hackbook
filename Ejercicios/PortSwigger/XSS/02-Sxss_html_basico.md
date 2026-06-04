@@ -45,4 +45,4 @@ El servidor almacena el comentario malicioso en la base de datos. Al recargar la
 
 A diferencia de un ataque reflejado, al ser persistente, este código se ejecutará automáticamente en el navegador de cualquier usuario o administrador que visite esta entrada del blog en el futuro.
 
-**Laboratorio resuelto con éxito**
+**Laboratorio resuelto**
