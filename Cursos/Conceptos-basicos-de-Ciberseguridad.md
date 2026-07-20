@@ -133,7 +133,7 @@ Riesgos comunes en entornos de movilidad:
 
 •QR Codes: Peligro de Qrising (reemplazo de códigos QR legítimos por maliciosos).
 
-## 🛠️ Herramientas de Análisis de Amenazas
+## Herramientas de Análisis de Amenazas
 
 | Herramienta            | Función                                                     |
 | ---------------------- | ----------------------------------------------------------- |
@@ -169,6 +169,7 @@ Herramienta vital para el anonimato y para acceder a servicios .onion.
 - Diferencia entre Tor y una VPN:
 	La **VPN** cifra tu conexión a través de un único servidor central para darte privacidad y velocidad, ideal para uso diario.
 	**Tor** reenvía el tráfico por tres nodos voluntarios distintos para garantizar el anonimato total, siendo mucho más lento pero casi imposible de rastrear
+
 ## Anonimato Avanzado: Sistemas Operativos
 
 Para un pentester, el sistema operativo desde el que opera puede comprometer su identidad.

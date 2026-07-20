@@ -8,9 +8,9 @@ Los de código abierto, pueden ser utilizados y modificado libremente. Para usar
 
 El resto de SO conocidos, son distribuciones de Linux o usan su Kernel. 
 
-## 🐧Linux y GNU: Conceptos Clave
+## Linux y GNU: Conceptos Clave
 
-### 🧠 El Kernel
+### El Kernel
 
 Analogía: si el ordenador es un **coche**. El Kernel es el motor.
 
@@ -18,7 +18,7 @@ Analogía: si el ordenador es un **coche**. El Kernel es el motor.
 
 ![[Curso-Virtu-Kernel.png]]
 
-### 🛠️ GNU (Las Herramientas)
+### GNU
 
  Las herramientas necesarias (editor de texto, compiladores, sistemas de archivos) para tener un sistema operativo completo y libre.
 
@@ -29,7 +29,7 @@ Lo que se instala en un ordenador (como Ubuntu o Debian) es la suma de ambos:
 > **GNU** (Herramientas) + **Linux** (Kernel) = **Sistema Operativo Completo**
 
 --- 
-### ⚠️ El caso de Android
+### El caso de Android
 
 No todo lo que lleva el Kernel Linux es "GNU/Linux".
 
